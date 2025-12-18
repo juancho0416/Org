@@ -423,14 +423,15 @@ C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva c
 C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Organigrama\obj\Debug\net9.0\Organigrama.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Organigrama\obj\Debug\net9.0\Organigrama.RazorAssemblyInfo.cache
 C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Organigrama\obj\Debug\net9.0\Organigrama.RazorAssemblyInfo.cs
-C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Organigrama\obj\Debug\net9.0\Organigrama.sourcelink.json
 C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Organigrama\obj\Debug\net9.0\rjimswa.dswa.cache.json
 C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Organigrama\obj\Debug\net9.0\rjsmrazor.dswa.cache.json
 C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Organigrama\obj\Debug\net9.0\rjsmcshtml.dswa.cache.json
 C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Organigrama\obj\Debug\net9.0\scopedcss\Pages\Shared\_Layout.cshtml.rz.scp.css
 C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Organigrama\obj\Debug\net9.0\scopedcss\bundle\Organigrama.styles.css
 C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Organigrama\obj\Debug\net9.0\scopedcss\projectbundle\Organigrama.bundle.scp.css
+C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Organigrama\obj\Debug\net9.0\compressed\efj3a2zml3-pnt6wz415o.gz
 C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Organigrama\obj\Debug\net9.0\compressed\np3j324f18-61n19gt1b8.gz
+C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Organigrama\obj\Debug\net9.0\compressed\agqwvau54p-x0xcn8z742.gz
 C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Organigrama\obj\Debug\net9.0\compressed\08qvpknyfe-bqjiyaj88i.gz
 C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Organigrama\obj\Debug\net9.0\compressed\kfmxi3lqjp-c2jlpeoesf.gz
 C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Organigrama\obj\Debug\net9.0\compressed\1ub297d8n4-erw9l3u2r3.gz
@@ -502,5 +503,3 @@ C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva c
 C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Organigrama\obj\Debug\net9.0\Organigrama.pdb
 C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Organigrama\obj\Debug\net9.0\Organigrama.genruntimeconfig.cache
 C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Organigrama\obj\Debug\net9.0\ref\Organigrama.dll
-C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Organigrama\obj\Debug\net9.0\compressed\efj3a2zml3-pnt6wz415o.gz
-C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Organigrama\obj\Debug\net9.0\compressed\agqwvau54p-x0xcn8z742.gz
