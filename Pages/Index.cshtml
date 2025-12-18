@@ -1,0 +1,52 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Organigrama";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/site.css">
+}
+
+<div class="app-container">
+    <header class="app-header">
+    </header>
+    <main>
+        <div class="org-container">
+
+            <header class="page-header">
+                <h1>Organigrama de TI</h1>
+                <p class="lead-text">FIlrar por area o buscar por nombre de empleado.</p>
+            </header>
+
+            <div class="control-group">
+
+                <div class="area-selector-module">
+                    <select id="area-selector" class="area-selector-dropdown">
+                        <option value="">Seleccione un Área para ver su Director</option>
+                    </select>
+                </div>
+
+                <div class="search-module">
+                    <input type="text" id="employee-search-input" placeholder="Buscar empleado por nombre o puesto...">
+                    <button id="employee-search-button" class="btn-search">Buscar</button>
+                    <span id="search-status" class="search-status-message"></span>
+                </div>
+            </div>
+
+            <div id="org-breadcrumbs" class="breadcrumbs-module">
+            </div>
+
+            <div id="org-view">
+            </div>
+        </div>
+    </main>
+
+    <div id="filterOverlay" class="filter-overlay" onclick="window.toggleFilterPanel()"></div>
+</div>
+<div id="custom-tooltip" class="custom-tooltip"></div>
+
+@section Scripts {
+    <script src="~/js/site.js"></script>
+}
