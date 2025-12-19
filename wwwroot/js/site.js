@@ -528,3 +528,17 @@ document.querySelectorAll('.glass-pill').forEach(pill => {
         });
     }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+

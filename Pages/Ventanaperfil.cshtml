@@ -36,28 +36,43 @@
                             <div class="avatar-ring"></div>
                         </div>
                     </div>
-                    <div class="col-lg-9">
-                        <div class="info-container">
+                    <div class="col-lg-9 text-center text-lg-start">
+                        <div class="info-container pt-lg-4">
                             <span class="area-label">@Model.Empleado.Area</span>
                             <h1 class="display-name">@Model.Empleado.Nombre</h1>
                             <p class="role-text">@Model.Empleado.Puesto</p>
 
-                            <div class="pills-container">
-                                <div class="glass-pill"><i class="far fa-envelope"></i> @Model.Empleado.Email</div>
-                                <div class="glass-pill"><i class="far fa-id-card"></i> ID: #@Model.Empleado.Id</div>
+                            <div class="pills-container justify-content-center justify-content-lg-start">
+                                <div class="glass-pill"><i class="far fa-envelope me-2"></i> @Model.Empleado.Email</div>
+                                <div class="glass-pill"><i class="far fa-id-card me-2"></i> ID: #@Model.Empleado.Id
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="cv-section-modern">
-                    <div class="cv-card-inner">
+                <div class="cv-section-modern mt-5">
+                    <div class="cv-card-inne flex-column flex-xl-row gap-4">
                         <div class="cv-info">
-                            <h3>Expediente Digital</h3>
-                            <p>Documentación oficial cargada en el sistema.</p>
+                            <h3 class="mb-1">Expediente Digital</h3>
+                            <p class="text-muted mb-0">Documentación oficial cargada en el sistema.</p>
                         </div>
 
-                        <div class="cv-actions-grid">
+                        <div class="agenda-box-highlight d-flex align-items-center gap-3">
+                            <div class="icon-circle">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <strong class="agenda-title">Agenda de Actividades</strong>
+                                <span class="agenda-subtitle">Registro diario de tareas y bitácora</span>
+                            </div>
+                            <a href="/Agenda/@Model.Empleado.Id" class="btn-agenda-link">
+                                Abrir <i class="fas fa-chevron-right ms-1"></i>
+                            </a>
+                        </div>
+
+
+                        <div class="cv-actions-grid justify-content-center">
                             <form method="post" asp-page-handler="UploadCV" asp-route-id="@Model.Empleado.Id"
                                 enctype="multipart/form-data" id="uploadForm">
                                 <input type="file" asp-for="ArchivoCV" id="cvInput" hidden accept=".pdf"
@@ -70,22 +85,22 @@
 
                             @if (tieneCV)
                             {
-                                <div class="action-divider"></div>
 
                                 <button type="button" class="action-btn view-btn" onclick="mostrarModalCV()">
                                     <i class="fas fa-eye"></i> Vista Previa
                                 </button>
 
-                                <a href="/uploads/cvs/@Model.Empleado.CvUrl" target="_blank" class="icon-btn-glass"><i
-                                        class="fas fa-external-link-alt"></i></a>
+                                <a href="/uploads/cvs/@Model.Empleado.CvUrl" target="_blank" class="icon-btn-glass"
+                                    data-tippy-content="Abrir en pestaña nueva">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
 
-                                <form method="post" asp-page-handler="DeleteCV" asp-route-id="@Model.Empleado.Id"
-                                    class="m-0">
-                                    <button type="submit" class="icon-btn-delete"
-                                        onclick="return confirm('¿Borrar definitivamente el CV?')">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
+                                <button type="submit" class="icon-btn-delete"
+                                    data-tippy-content="Eliminar currículum definitivamente"
+                                    onclick="return confirm('¿Borrar definitivamente el CV?')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+
                             }
                         </div>
                     </div>
@@ -110,6 +125,8 @@
     </div>
 </div>
 
+</div>
+
 <style>
     :root {
         --area-primary: #5A67D8;
@@ -122,36 +139,366 @@
         font-family: 'Inter', sans-serif;
     }
 
-    /* STATUS BADGE NUEVO */
-    .status-badge-container {
+    /* BOTÓN REGRESAR */
+    .btn-regresar-custom {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: white;
+        color: var(--area-primary);
+        padding: 10px 22px;
+        border-radius: 12px;
+        font-weight: 700;
+        text-decoration: none !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+        margin-bottom: 25px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-regresar-custom:hover {
+        transform: translateX(-5px);
+        background: var(--area-primary);
+        color: white;
+        box-shadow: 0 6px 15px rgba(90, 103, 216, 0.3);
+    }
+
+    /* CARD PRINCIPAL */
+    .profile-card-glass {
+        background: white;
+        border-radius: 40px;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+        position: relative;
+    }
+
+    .card-header-gradient {
+        background: linear-gradient(135deg, var(--area-primary), var(--area-secondary));
+        height: 140px;
+        position: relative;
+    }
+
+    .card-body-content {
+        padding: 0 50px 50px 50px;
+    }
+
+    /* AVATAR AJUSTADO */
+    .avatar-wrapper {
+        position: relative;
+        width: 180px;
+        height: 180px;
+        margin: -90px auto 20px;
+        z-index: 20;
+    }
+
+    .avatar-wrapper img,
+    .avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        border-radius: 45px;
+        border: 8px solid white;
+        object-fit: cover;
+        background: #f8fafc;
+        position: relative;
+        z-index: 5;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .avatar-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        color: var(--area-primary);
+        font-weight: 800;
+    }
+
+    .avatar-ring {
         position: absolute;
-        top: 25px;
-        right: 40px;
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(8px);
-        padding: 6px 16px;
+        inset: -12px;
+        border: 3px dashed var(--area-primary);
+        border-radius: 55px;
+        animation: spin 30s linear infinite;
+        opacity: 0.3;
+    }
+
+    /* INFORMACIÓN PERSONAL */
+    .display-name {
+        font-weight: 900;
+        font-size: clamp(1.8rem, 5vw, 3rem);
+        color: #1e293b;
+        margin: 5px 0;
+        letter-spacing: -1px;
+        line-height: 1.1;
+    }
+
+    .role-text {
+        font-size: 1.2rem;
+        color: #64748b;
+        margin-bottom: 15px;
+    }
+
+    .area-label {
+        color: var(--area-primary);
+        font-weight: 800;
+        letter-spacing: 2px;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        display: block;
+    }
+
+    .pills-container {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .glass-pill {
+        background: #f8fafc;
+        padding: 8px 18px;
         border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+        transition: 0.2s;
+    }
+
+    .glass-pill:hover {
+        background: white;
+        border-color: var(--area-primary);
+        color: var(--area-primary);
+    }
+
+    /* SECCIÓN CV Y AGENDA */
+    .cv-card-inner {
+        background: #f8fafc;
+        padding: 30px;
+        border-radius: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: 1px solid #edf2f7;
+    }
+
+    .agenda-box-highlight {
+        background: white;
+        padding: 20px 25px;
+        border-radius: 20px;
+        border-left: 5px solid #ed8936;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        min-width: 320px;
+        transition: all 0.3s ease;
+    }
+
+    .agenda-box-highlight:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(237, 137, 54, 0.15);
+    }
+
+    .btn-agenda-link {
+        background: #ed8936;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        text-decoration: none !important;
+        transition: 0.3s;
+    }
+
+    .btn-agenda-link:hover {
+        background: #c05621;
+        box-shadow: 0 4px 12px rgba(237, 137, 54, 0.4);
+    }
+
+    .agenda-title {
+        display: block;
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 4px;
+        line-height: 1;
+    }
+
+    .agenda-subtitle {
+        display: block;
+        font-size: 0.85rem;
+        color: #64748b;
+        font-weight: 500;
+        line-height: 2.5;
+    }
+
+    /* BOTONES DE ACCIÓN */
+    .cv-actions-grid {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        padding: 12px 20px;
+        border-radius: 14px;
+        border: none;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
         display: flex;
         align-items: center;
         gap: 8px;
+    }
+
+    .view-btn {
+        background: var(--area-primary);
+        color: white;
+        margin-top: 20px;
+    }
+
+    .view-btn:hover {
+        background: #434190;
+        filter: brightness(1.1);
+        transform: translateY(-2px);
+    }
+
+    .upload-btn {
+        background: white;
+        border: 2px solid var(--area-primary);
+        color: var(--area-primary);
+        margin-top: 20px;
+    }
+
+    .upload-btn:hover {
+        background: var(--area-secondary);
+        color: var(--area-primary);
+        transform: translateY(-2px);
+    }
+
+    .icon-btn-glass,
+    .icon-btn-delete {
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        border: 1px solid #e2e8f0;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    .icon-btn-glass {
+        background: white;
+        color: #64748b;
+        text-decoration: none;
+    }
+
+    .icon-btn-glass:hover {
+        background: #f1f5f9;
+        color: var(--area-primary);
+        border-color: var(--area-primary);
+    }
+
+    .icon-btn-delete {
+        background: #fff1f2;
+        color: #e11d48;
+        border-color: #fecdd3;
+    }
+
+    .icon-btn-delete:hover {
+        background: #e11d48;
+        color: white;
+        box-shadow: 0 4px 12px rgba(225, 29, 72, 0.3);
+    }
+
+    /* STATUS BADGE */
+    .status-badge-container {
+        position: absolute;
+        top: 25px;
+        right: 30px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        padding: 8px 16px;
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
         border: 1px solid rgba(255, 255, 255, 0.3);
     }
 
     .status-dot {
-        width: 8px;
-        height: 8px;
+        width: 10px;
+        height: 10px;
         background: #4ade80;
         border-radius: 50%;
-        box-shadow: 0 0 10px #4ade80;
         animation: pulse-green 2s infinite;
     }
 
     .status-text {
         color: white;
-        font-size: 0.75rem;
-        font-weight: 700;
+        font-size: 0.7rem;
+        font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 1px;
+    }
+
+    /* MODAL */
+    .modal-full-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(8px);
+        align-items: center;
+        justify-content: center;
+        padding: 30px;
+    }
+
+    .btn-cerrar-modal {
+        transition: all 0.3s;
+    }
+
+    .btn-cerrar-modal:hover {
+        background: #e11d48;
+        color: white;
+        transform: rotate(90deg);
+    }
+
+    .modal-container-white {
+        background: white;
+        width: 100%;
+        max-width: 1000px;
+        border-radius: 30px;
+        overflow: hidden;
+    }
+
+    .modal-header-top {
+        padding: 20px 30px;
+        background: #f8fafc;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    #iframePDF {
+        width: 100%;
+        height: 75vh;
+        border: none;
+    }
+
+    /* ANIMACIONES */
+    @@keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
     }
 
     @@keyframes pulse-green {
@@ -171,254 +518,74 @@
         }
     }
 
-    /* BOTÓN REGRESAR */
-    .btn-regresar-custom {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        background: white;
-        color: var(--area-primary);
-        padding: 10px 22px;
-        border-radius: 12px;
-        font-weight: 700;
-        text-decoration: none !important;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        border: 1px solid #e2e8f0;
-        margin-bottom: 20px;
-        font-size: 0.9rem;
+    /* RESPONSIVE */
+    @@media (max-width: 991px) {
+        .card-body-content {
+            padding: 0 30px 40px 30px;
+        }
+
+        .display-name {
+            font-size: 2.2rem;
+        }
+
+        .cv-card-inner {
+            padding: 20px;
+            flex-direction: column;
+            gap: 20px;
+        }
     }
 
-    /* CARD ESTRUCTURA */
-    .profile-card-glass {
-        background: white;
-        border-radius: 40px;
-        border: 1px solid #e2e8f0;
-        overflow: hidden;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
-        position: relative;
-    }
-
-    .card-header-gradient {
-        background: linear-gradient(135deg, var(--area-primary), var(--area-secondary));
-        height: 130px;
-        position: relative;
-    }
-
-    .card-body-content {
-        padding: 0 50px 50px 50px;
-    }
-
-    /* AVATAR */
-    .avatar-wrapper {
-        position: relative;
-        width: 180px;
-        height: 180px;
-        margin: -90px auto 25px;
-    }
-
-    .avatar-wrapper img,
-    .avatar-placeholder {
-        width: 100%;
-        height: 100%;
-        border-radius: 50px;
-        border: 8px solid white;
-        object-fit: cover;
-        background: #f8fafc;
-        position: relative;
-        z-index: 5;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
-    }
-
-    .avatar-placeholder {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 4.5rem;
-        color: var(--area-primary);
-        font-weight: 800;
-    }
-
-    .avatar-ring {
+    /* Tooltip generado por JS */
+    .js-custom-tooltip {
         position: absolute;
-        inset: -10px;
-        border: 2.5px dashed var(--area-primary);
-        border-radius: 65px;
-        animation: spin 25s linear infinite;
-        opacity: 0.25;
-    }
-
-    /* TEXTOS */
-    .display-name {
-        font-weight: 900;
-        font-size: 3rem;
-        color: #1e293b;
-        margin: 0;
-        letter-spacing: -1px;
-    }
-
-    .role-text {
-        font-size: 1.3rem;
-        color: #64748b;
-        margin-top: -5px;
-    }
-
-    .area-label {
-        color: var(--area-primary);
-        font-weight: 800;
-        letter-spacing: 2px;
-        font-size: 0.85rem;
-        text-transform: uppercase;
-    }
-
-    /* PILLS INFO */
-    .pills-container {
-        display: flex;
-        gap: 10px;
-        margin-top: 15px;
-    }
-
-    .glass-pill {
-        background: #f1f5f9;
-        padding: 6px 15px;
-        border-radius: 50px;
-        font-size: 0.85rem;
+        background: #00205383;
+        backdrop-filter: blur(9px);
+        color: white;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 0.75rem;
         font-weight: 600;
-        color: #475569;
-        border: 1px solid #e2e8f0;
-    }
-
-    /* CV ACCIONES */
-    .cv-card-inner {
-        background: #f8fafc;
-        padding: 25px;
-        border-radius: 25px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border: 1px solid #edf2f7;
-        margin-top: 40px;
-    }
-
-    .cv-actions-grid {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .action-btn {
-        padding: 12px 24px;
-        border-radius: 14px;
-        border: none;
-        font-weight: 700;
-        cursor: pointer;
-        transition: 0.3s;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 0.9rem;
-    }
-
-    .view-btn {
-        background: var(--area-primary);
-        color: white;
-        box-shadow: 0 10px 15px -3px rgba(90, 103, 216, 0.3);
-    }
-
-    .upload-btn {
-        background: white;
-        border: 2px solid var(--area-primary);
-        color: var(--area-primary);
-    }
-
-    .icon-btn-glass {
-        width: 45px;
-        height: 45px;
-        background: white;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #64748b;
-        border: 1px solid #e2e8f0;
-        text-decoration: none;
-    }
-
-    .icon-btn-delete {
-        width: 45px;
-        height: 45px;
-        background: #fff1f2;
-        color: #e11d48;
-        border: 1px solid #fecdd3;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: 0.2s;
-    }
-
-    .icon-btn-delete:hover {
-        background: #e11d48;
-        color: white;
-    }
-
-    /* MODAL */
-    .modal-full-overlay {
-        display: none;
-        position: fixed;
-        inset: 0;
         z-index: 99999;
-        background: rgba(15, 23, 42, 0.466);
-        backdrop-filter: blur(10px);
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
+        pointer-events: none;
+        transform: translateX(-50%);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        animation: tooltip-in 0.2s ease-out forwards;
     }
 
-    .modal-container-white {
-        background: white;
-        width: 100%;
-        max-width: 900px;
-        border-radius: 30px;
-        overflow: hidden;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    .js-custom-tooltip.fade-out {
+        animation: tooltip-out 0.15s ease-in forwards;
     }
 
-    .modal-header-top {
-        padding: 20px 30px;
-        background: #f8fafc;
-        border-bottom: 1px solid #eee;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-weight: 800;
-        color: #1e293b;
-    }
-
-    .btn-cerrar-modal {
-        background: #e2e8f0;
-        border: none;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        font-size: 1.5rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    #iframePDF {
-        width: 100%;
-        height: 55vh;
-        border: none;
-    }
-
-    @@keyframes spin {
+    @@keyframes tooltip-in {
         from {
-            transform: rotate(0deg);
+            opacity: 0;
+            transform: translateX(-50%) translateY(5px);
         }
 
         to {
-            transform: rotate(360deg);
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
         }
+    }
+
+    @@keyframes tooltip-out {
+        from {
+            opacity: 1;
+        }
+
+        to {
+            opacity: 0;
+        }
+    }
+
+    /* Limpieza de márgenes para alineación */
+    .icon-btn-glass,
+    .icon-btn-delete {
+        margin: 0 !important;
+    }
+
+    .cv-actions-grid {
+        gap: 12px;
     }
 </style>
 
@@ -436,4 +603,35 @@
     window.onclick = function (e) {
         if (e.target == document.getElementById('modalVisualizador')) ocultarModalCV();
     }
+
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const tooltips = document.querySelectorAll('[data-tippy-content]');
+
+        tooltips.forEach(el => {
+            let tooltipBox;
+
+            el.addEventListener('mouseenter', (e) => {
+                // Crear el elemento del tooltip
+                tooltipBox = document.createElement('div');
+                tooltipBox.className = 'js-custom-tooltip';
+                tooltipBox.innerText = el.getAttribute('data-tippy-content');
+                document.body.appendChild(tooltipBox);
+
+                // Posicionamiento dinámico
+                const rect = el.getBoundingClientRect();
+                tooltipBox.style.top = (rect.top + window.scrollY - 45) + 'px';
+                tooltipBox.style.left = (rect.left + (rect.width / 2)) + 'px';
+            });
+
+            el.addEventListener('mouseleave', () => {
+                if (tooltipBox) {
+                    tooltipBox.classList.add('fade-out');
+                    setTimeout(() => tooltipBox.remove(), 150);
+                }
+            });
+        });
+    });
+
 </script>

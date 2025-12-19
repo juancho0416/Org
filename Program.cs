@@ -1,43 +1,40 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Organigrama.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// =================================================================
-// 1. CONFIGURACIÓN DE SERVICIOS
-// =================================================================
+// 1. Obtener la ruta absoluta de la base de datos en la raíz
+string dbPath = Path.Combine(Directory.GetCurrentDirectory(), "Organigrama.db");
+
+// 2. Configurar el contexto con esa ruta física
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite($"Data Source={dbPath}"));
 
 builder.Services.AddRazorPages();
-
-// 🚨 MANTENER: Habilitar el soporte para controladores API (necesario para EmpleadoController)
 builder.Services.AddControllers();
-
-// 🚨 ELIMINADO: Ya no necesitamos registrar IEmpleadoService
-
 
 var app = builder.Build();
 
-// =================================================================
-// 2. MIDDLEWARE DE CONFIGURACIÓN
-// =================================================================
-
-if (!app.Environment.IsDevelopment())
+// LOG DE DEPURACIÓN: Esto aparecerá en tu terminal al iniciar
+using (var scope = app.Services.CreateScope())
 {
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    Console.WriteLine($"🔍 Verificando archivo en: {dbPath}");
+
+    if (File.Exists(dbPath))
+    {
+        var count = context.Empleados.Count();
+        Console.WriteLine($"✅ Archivo encontrado. Empleados en DB: {count}");
+    }
+    else
+    {
+        Console.WriteLine("❌ ERROR: No se encuentra el archivo Organigrama.db en la raíz.");
+    }
 }
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
-app.UseAuthorization();
-
-// 🚨 MANTENER: Mapea los endpoints para los Controladores API
-app.MapControllers();
-
 app.MapRazorPages();
+app.MapControllers();
 
 app.Run();

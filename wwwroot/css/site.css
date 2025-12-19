@@ -34,7 +34,7 @@ body { background-color: var(--color-background); font-family: var(--font-family
 }
 .btn-up-modern:hover { background: var(--color-text-dark); color: white; }
 
-/* 4. BURBUJAS DE ÁREA (MODERNO) */
+/* 4. BURBUJAS DE ÁREA  */
 .areas-container-modern { display: flex; flex-direction: column; gap: 15px; }
 .area-bubble-wrapper { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: 0.3s; }
 .area-bubble-header { padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
@@ -54,32 +54,177 @@ body { background-color: var(--color-background); font-family: var(--font-family
 .subordinate-info strong { display: block; font-size: 0.95rem; }
 .puesto-label { font-size: 0.75rem; color: var(--color-text-light); }
 
-/* 6. DIAGRAMA COMPACTO */
-.org-tree-container { width: 100%; overflow-x: auto; padding: 40px 0; background: #fff; border-radius: 20px; border: 1px solid var(--color-border); text-align: center; }
-.org-chart ul { display: flex; justify-content: center; list-style: none; padding: 20px 0 0 0; position: relative; }
-.org-chart li { padding: 20px 10px 0 10px; position: relative; transition: 0.5s; }
-.org-chart li::before, .org-chart li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #cbd5e0; width: 50%; height: 20px; }
-.org-chart li::after { right: auto; left: 50%; border-left: 2px solid #cbd5e0; }
-.org-chart li:only-child::after, .org-chart li:only-child::before { display: none; }
-.org-chart li:only-child { padding-top: 0; }
-.org-chart li:first-child::after { border-radius: 5px 0 0 0; }
-.org-chart li:last-child::before { border-right: 2px solid #cbd5e0; border-radius: 0 5px 0 0; }
-.org-chart li:first-child::before, .org-chart li:last-child::after { border: 0 none; }
-.org-chart ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #cbd5e0; width: 0; height: 20px; }
+/*ORGANIGRAMA EN FORMA DE  DIAGRAMA*/
 
-.subordinate-module.diagram-view {
-    display: inline-flex; align-items: center; padding: 6px 12px; background: white; border-radius: 50px;
-    border: 2px solid var(--card-primary-color); min-width: 160px; gap: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+.org-tree-container { 
+    width: 100%; 
+    overflow-x: auto; 
+    overflow-y: hidden;
+    padding: 40px 20px; 
+    background: #f8fafc; 
+    border-radius: 20px; 
+    border: 1px solid #e2e8f0; 
+    text-align: center;
+    /* Suaviza el scroll en móviles */
+    -webkit-overflow-scrolling: touch;
 }
-.subordinate-module.diagram-view .profile-pic-container { --size: 35px; border-width: 2px; }
-.subordinate-module.diagram-view .subordinate-info strong { font-size: 0.8rem; }
-.subordinate-module.diagram-view .subordinate-info span { font-size: 0.65rem; color: var(--color-text-light); display: block; }
+
+/* Estilo de la barra de desplazamiento para que no estorbe */
+.org-tree-container::-webkit-scrollbar {
+    height: 8px;
+}
+.org-tree-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+.org-tree-container::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 10px;
+}
+.org-tree-container::-webkit-scrollbar-thumb:hover {
+    background: #ffffff;
+}
+
+/* Contenedor del árbol */
+.org-chart {
+    display: inline-block;
+    min-width: 100%;
+}
+
+.org-chart ul { 
+    display: flex; 
+    justify-content: center; 
+    list-style: none; 
+    padding: 20px 0 0 0; 
+    position: relative; 
+    transition: all 0.5s;
+}
+
+/* Conectores Lineales */
+.org-chart li { 
+    padding: 20px 5px 0 5px; 
+    position: relative; 
+    transition: 0.5s;
+    text-align: center;
+}
+
+.org-chart li::before, .org-chart li::after { 
+    content: ''; 
+    position: absolute; 
+    top: 0; 
+    right: 50%; 
+    border-top: 2px solid #cbd5e0; 
+    width: 50%; 
+    height: 20px; 
+}
+
+.org-chart li::after { 
+    right: auto; 
+    left: 50%; 
+    border-left: 2px solid #cbd5e0; 
+}
+
+.org-chart li:only-child::after, 
+.org-chart li:only-child::before { 
+    display: none; 
+}
+
+.org-chart li:only-child { 
+    padding-top: 0; 
+}
+
+.org-chart li:first-child::after { 
+    border-radius: 5px 0 0 0; 
+}
+
+.org-chart li:last-child::before { 
+    border-right: 2px solid #cbd5e0; 
+    border-radius: 0 5px 0 0; 
+}
+
+.org-chart li:first-child::before, 
+.org-chart li:last-child::after { 
+    border: 0 none; 
+}
+
+.org-chart ul ul::before { 
+    content: ''; 
+    position: absolute; 
+    top: 0; 
+    left: 50%; 
+    border-left: 2px solid #cbd5e0; 
+    width: 0; 
+    height: 20px; 
+} 
+
+/* Tarjetas (Nodos) del Diagrama */
+.subordinate-module.diagram-view {
+    display: inline-flex; 
+    align-items: center; 
+    padding: 8px 12px; 
+    background: white; 
+    border-radius: 12px;
+    border:none;
+    min-width: 140px; 
+    max-width: 200px;
+    gap: 10px; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    text-decoration: none; 
+}
+
+.subordinate-module.diagram-view:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+    background: #fffaf0;
+}
+
+/* Miniatura de Foto en el Diagrama */
+.subordinate-module.diagram-view .profile-pic-container { 
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #ed8936;
+}
+
+.subordinate-module.diagram-view .profile-pic-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Texto del Empleado */
+.subordinate-module.diagram-view .subordinate-info {
+    text-align: left;
+    line-height: 1.2;
+}
+
+.subordinate-module.diagram-view .subordinate-info strong { 
+    font-size: 0.75rem; 
+    color: #2d3748;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100px;
+}
+
+.subordinate-module.diagram-view .subordinate-info span { 
+    font-size: 0.6rem; 
+    color: #718096; 
+    display: block; 
+}
 
 /* 7. BREADCRUMBS Y CONTROLES */
 .subordinate-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--color-border); }
 .view-switch { display: flex; gap: 8px; }
 .btn-view { padding: 6px 15px; border-radius: 20px; border: 1px solid var(--color-border); cursor: pointer; font-size: 0.8rem; }
-.btn-view.active { background: var(--color-primary-default); color: white; border-color: var(--color-primary-default); }
+.btn-view:hover{transform: translateY(-2px); box-shadow: 0 4px 12px rgba(76, 81, 191, 0.3);}
+.btn-view.active { background: var(--color-primary-default); color: white; border-color: var(--color-primary-default);
+box-shadow:0 4px 12px rgba(97, 76, 191, 0.3);
+}
 
 .breadcrumb-item { font-size: 0.9rem; color: var(--color-text-light); }
 .breadcrumb-link { color: var(--color-primary-default); cursor: pointer; text-decoration: none; font-weight: 600; }
@@ -156,7 +301,7 @@ body { background-color: var(--color-background); font-family: var(--font-family
     grid-template-columns: 1fr 1fr;
     gap: 20px;
     background: white;
-    padding: 25px;
+    padding: 28px;
     border-radius: 24px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.04);
     margin-bottom: 30px;
@@ -165,7 +310,7 @@ body { background-color: var(--color-background); font-family: var(--font-family
 
 .area-selector-dropdown, #employee-search-input {
     width: 100%;
-    padding: 12px 20px;
+    padding: 10px 8px;
     border-radius: 14px;
     border: 2px solid #f1f5f9;
     background: #f8fafc;
@@ -184,6 +329,7 @@ body { background-color: var(--color-background); font-family: var(--font-family
     background: var(--color-primary-default);
     color: white;
     border: none;
+    margin-top: 10px;
     padding: 12px 25px;
     border-radius: 14px;
     font-weight: 600;
@@ -230,7 +376,7 @@ body { background-color: var(--color-background); font-family: var(--font-family
     padding: 15px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.15);
     width: 240px;
-    pointer-events: none; /* Importante para que no bloquee el mouse */
+    pointer-events: none;
     animation: fadeIn 0.2s ease-out;
 }
 
@@ -266,7 +412,7 @@ body { background-color: var(--color-background); font-family: var(--font-family
 }
 .tooltip-hierarchy-info {
     text-align: center;
-    background: #f7fafc; /* Un fondo gris muy ligero para diferenciarlo */
+    background: #f7fafc; 
     border-radius: 8px;
     padding: 6px;
 }
@@ -312,7 +458,7 @@ body { background-color: var(--color-background); font-family: var(--font-family
     display: block;
 }
 
-/* Reutilizando tu estilo de .chief-card-premium para el CV */
+Reutilizando tu estilo de .chief-card-premium para el CV
 .cv-card-premium {
     background: white;
     border-radius: 20px;
@@ -353,12 +499,6 @@ body { background-color: var(--color-background); font-family: var(--font-family
     display: flex; justify-content: space-between; 
 }
 .modal-window-body iframe { width: 100%; height: 75vh; border: none; }
-
-
-
-
-
-
 
     /* 1. CONFIGURACIÓN DINÁMICA DE COLORES */
     :root {
@@ -508,7 +648,7 @@ body { background-color: var(--color-background); font-family: var(--font-family
         color: var(--area-primary);
     }
 
-    /* 8. MODAL (Basado en custom-modal-overlay) */
+    /* 8. MODAL */
     .modal-full-overlay {
         display: none;
         position: fixed;
@@ -531,11 +671,6 @@ body { background-color: var(--color-background); font-family: var(--font-family
     }
 
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-
-
-
-
     /* --- COMBO DINÁMICO: EFECTOS VISUALES --- */
 
 /* 1. Preparación para Tilt y Brillo */
@@ -596,12 +731,6 @@ body { background-color: var(--color-background); font-family: var(--font-family
     animation: fadeInUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) both;
 }
 
-
-
-
-
-
-
 /* --- ANIMACIONES ADICIONALES --- */
 
 /* 1. Brillo de Conexión Jerárquica */
@@ -614,8 +743,6 @@ body { background-color: var(--color-background); font-family: var(--font-family
     box-shadow: 0 0 10px rgba(76, 81, 191, 0.4);
     transition: all 0.4s ease;
 }
-
-
 @keyframes pulse-green {
     0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
     70% { box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); }
@@ -638,3 +765,178 @@ body { background-color: var(--color-background); font-family: var(--font-family
     filter: blur(4px);
     transition: filter 0.3s ease;
 }
+
+
+/*Agenda*
+/* Estilo específico para items de agenda */
+.subordinate-module-modern {
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.subordinate-module-modern:hover {
+    border-left-color: #ed8936; /* Color naranja al pasar el mouse */
+    background: #fffaf0;
+    transform: translateX(10px); /* Pequeño desplazamiento a la derecha */
+}
+
+    /* Contenedor principal de la línea */
+    .timeline-container {
+        position: relative;
+        padding-left: 30px;
+        border-left: 3px solid #e2e8f0; /* La línea vertical */
+        margin-left: 15px;
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    /* El punto decorativo en la línea */
+    .timeline-dot {
+        position: absolute;
+        left: -38px;
+        top: 20px;
+        width: 14px;
+        height: 14px;
+        background-color: #ed8936;
+        border: 3px solid white;
+        border-radius: 50%;
+        box-shadow: 0 0 0 3px #e2e8f0;
+        z-index: 2;
+    }
+
+    /* Tarjeta de actividad mejorada */
+    .timeline-content {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #edf2f7;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .timeline-content:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        border-color: #ed8936;
+    }
+
+    /* Etiqueta de hora */
+    .time-tag {
+        background: #fffaf0;
+        color: #dd6b20;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: 800;
+        font-size: 0.85rem;
+        border: 1px solid #feebc8;
+    }
+
+    .activity-text {
+        font-weight: 600;
+        color: #2d3748;
+        display: block;
+    }
+
+    .activity-date {
+        color: #a0aec0;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    /* Contenedor del grupo del día */
+    .day-label {
+        font-size: 0.85rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: #718096;
+        letter-spacing: 1px;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+    }
+
+    .day-label::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #e2e8f0;
+        margin-left: 15px;
+    }
+
+    /* Estructura de la línea */
+    .timeline-container-modern {
+        border-left: 2px solid #edf2f7;
+        margin-left: 50px; 
+        padding-left: 20px;
+    }
+
+    .timeline-item-modern {
+        position: relative;
+        margin-bottom: 12px;
+    }
+
+    /* Hora a la izquierda de la línea */
+    .item-hour {
+        position: absolute;
+        left: -75px;
+        top: 10px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #ed8936;
+        background: #fff;
+        padding: 2px 5px;
+    }
+
+    /* Punto en la línea */
+    .timeline-item-modern::before {
+        content: "";
+        position: absolute;
+        left: -27px;
+        top: 15px;
+        width: 12px;
+        height: 12px;
+        background: #ed8936;
+        border: 2px solid #fff;
+        border-radius: 50%;
+        z-index: 1;
+    }
+
+    /* Tarjeta de contenido */
+    .item-card {
+        background: white;
+        padding: 12px 18px !important;
+        border-radius: 10px !important;
+        border: 1px solid #f0f0f0 !important;
+        transition: all 0.2s ease;
+    }
+
+    .item-card:hover {
+        border-color: #ed8936 !important;
+        background: #fffaf0 !important;
+        transform: translateX(5px);
+    }
+
+    .activity-text {
+        color: #2d3748;
+        font-weight: 500;
+    }
+
+    .btn-delete-minimal {
+        background-color: #a30202c4;
+        border: 1px solid #feb2b2; 
+        border-radius: 8px;
+        width: 12px;
+        height: 12px;
+     
+    }
+
+    .btn-delete-minimal:hover {
+        background-color:#ff0000; 
+        color: white;  
+        animation: pulse-red infinite;
+        box-shadow: 0 4px 10px rgba(229, 62, 62, 0.2);
+    }
+   
+
