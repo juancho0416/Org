@@ -1,105 +1,915 @@
 @page "{id:int}"
 @model Organigrama.Pages.AgendaModel
 @{
-    ViewData["Title"] = "Agenda Diaria";
+    ViewData["Title"] = $"Agenda - {Model.NombreEmpleado}";
+    var colors = Model.GetAreaColors();
 }
 
-<div class="app-container">
-    <main>
-        <div class="org-container">
-            <header class="page-header">
-                <div class="d-flex align-items-center gap-3">
-                    <a asp-page="/VentanaPerfil" asp-route-id="@Model.EmpleadoId" class="btn-up-modern">
-                        <i class="fas fa-arrow-left"></i> Volver al Perfil
-                    </a>
-                    <h1 class="m-0">Agenda de @Model.NombreEmpleado</h1>
-                </div>
-            </header>
+<!DOCTYPE html>
+<html lang="es">
 
-            <div class="control-group">
-                <form method="post" class="d-flex gap-2 w-100">
-                    <div class="search-module" style="flex: 1;">
-                        <input type="text" name="NuevaActividad" placeholder="¿Qué actividad realizarás hoy?"
-                            class="area-selector-dropdown" style="width: 100%; border: 2px solid #e2e8f0;" required>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        /* ============================================
+           VARIABLES Y CONFIGURACIÓN
+           ============================================ */
+        :root {
+            --area-primary:
+                @colors.Primary
+            ;
+            --area-secondary:
+                @colors.Secondary
+            ;
+            --color-text-dark: #1e293b;
+            --color-text-light: #64748b;
+            --color-border: #e2e8f0;
+            --color-background: #f8fafc;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+            --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* ============================================
+           BASE
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--color-background);
+            color: var(--color-text-dark);
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           CONTENEDOR PRINCIPAL
+           ============================================ */
+        .agenda-wrapper {
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .agenda-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ============================================
+           HEADER
+           ============================================ */
+        .page-header {
+            margin-bottom: 30px;
+            animation: slideDown 0.6s var(--transition-bounce);
+        }
+
+        @@keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .page-title {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 900;
+            color: var(--color-text-dark);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .title-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--area-primary), var(--area-secondary));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* ============================================
+           BOTONES
+           ============================================ */
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            border-radius: 16px;
+            background: white;
+            color: var(--area-primary);
+            text-decoration: none;
+            font-weight: 700;
+            border: 2px solid var(--color-border);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-base);
+        }
+
+        .btn-back:hover {
+            transform: translateX(-8px);
+            background: var(--area-primary);
+            color: white;
+            border-color: var(--area-primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-export {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            border-radius: 16px;
+            background: #10b981;
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            border: none;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-base);
+        }
+
+        .btn-export:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* ============================================
+           FORMULARIO DE NUEVA ACTIVIDAD
+           ============================================ */
+        .add-activity-card {
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-md);
+            border: 2px solid var(--color-border);
+            animation: slideUp 0.6s var(--transition-bounce);
+        }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .form-icon {
+            width: 45px;
+            height: 45px;
+            background: var(--area-secondary);
+            color: var(--area-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .form-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--color-text-dark);
+            margin: 0;
+        }
+
+        .form-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .input-activity {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid var(--color-border);
+            border-radius: 16px;
+            font-size: 1rem;
+            background: var(--color-background);
+            transition: var(--transition-base);
+            outline: none;
+        }
+
+        .input-activity:focus {
+            border-color: var(--area-primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(90, 103, 216, 0.1);
+        }
+
+        .input-activity::placeholder {
+            color: var(--color-text-light);
+        }
+
+        .btn-submit {
+            padding: 14px 30px;
+            background: var(--area-primary);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-base);
+            white-space: nowrap;
+        }
+
+        .btn-submit:hover {
+            background: #434190;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* ============================================
+           ESTADÍSTICAS
+           ============================================ */
+        .stats-card {
+            background: linear-gradient(135deg, var(--area-primary), var(--area-secondary));
+            border-radius: 20px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-lg);
+            animation: fadeIn 0.8s ease;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .stats-info h3 {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .stats-info p {
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .stats-badge {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            padding: 15px 25px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 900;
+            color: white;
+        }
+
+        .stats-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ============================================
+           TIMELINE DE ACTIVIDADES
+           ============================================ */
+        .timeline-section {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: var(--shadow-md);
+            border: 2px solid var(--color-border);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-icon {
+            font-size: 5rem;
+            color: #cbd5e0;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @@keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .empty-text {
+            color: var(--color-text-light);
+            font-size: 1.1rem;
+        }
+
+        /* Grupo de día */
+        .day-group {
+            margin-bottom: 40px;
+            animation: fadeInUp 0.6s var(--transition-bounce) backwards;
+        }
+
+        .day-group:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .day-group:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .day-group:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .day-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .day-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--area-secondary);
+            color: var(--area-primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .day-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--color-text-dark);
+        }
+
+        .day-subtitle {
+            font-size: 0.85rem;
+            color: var(--color-text-light);
+            margin-left: auto;
+        }
+
+        /* Timeline */
+        .timeline-container {
+            position: relative;
+            padding-left: 80px;
+            margin-left: 20px;
+        }
+
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            left: 22px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom,
+                    var(--area-primary) 0%,
+                    var(--area-secondary) 50%,
+                    var(--area-primary) 100%);
+            background-size: 100% 200%;
+            animation: flowLine 3s linear infinite;
+            border-radius: 10px;
+            opacity: 0.6;
+        }
+
+        @@keyframes flowLine {
+            0% {
+                background-position: 0% 0%;
+            }
+
+            100% {
+                background-position: 0% 200%;
+            }
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .timeline-time {
+            position: absolute;
+            left: -60px;
+            top: 18px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--area-primary);
+            background: white;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -68px;
+            top: 22px;
+            width: 14px;
+            height: 14px;
+            background: var(--area-primary);
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 0 3px var(--area-secondary);
+            z-index: 2;
+        }
+
+        .activity-card {
+            background: var(--color-background);
+            padding: 18px 24px;
+            border-radius: 16px;
+            border: 2px solid var(--color-border);
+            transition: var(--transition-base);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .activity-card:hover {
+            background: white;
+            border-color: var(--area-primary);
+            transform: translateX(8px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .activity-text {
+            flex: 1;
+            font-size: 1rem;
+            color: var(--color-text-dark);
+            font-weight: 500;
+        }
+
+        .btn-delete {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            border: 2px solid #fecdd3;
+            background: #fff1f2;
+            color: #e11d48;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+
+        .btn-delete:hover {
+            background: #e11d48;
+            color: white;
+            border-color: #e11d48;
+            transform: scale(1.1);
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @@media (max-width: 768px) {
+            .agenda-wrapper {
+                padding: 20px 10px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .add-activity-card {
+                padding: 20px;
+            }
+
+            .form-group {
+                flex-direction: column;
+            }
+
+            .btn-submit {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .stats-card {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .timeline-container {
+                padding-left: 60px;
+            }
+
+            .timeline-time {
+                left: -50px;
+                font-size: 0.75rem;
+            }
+        }
+
+        /* ============================================
+           NOTIFICACIONES
+           ============================================ */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px 25px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 9999;
+            animation: slideInRight 0.4s var(--transition-bounce);
+            border-left: 5px solid;
+        }
+
+        .notification.success {
+            border-left-color: #10b981;
+        }
+
+        .notification.error {
+            border-left-color: #ef4444;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .notification.success .notification-icon {
+            background: #d1fae5;
+            color: #10b981;
+        }
+
+        .notification.error .notification-icon {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 700;
+            color: var(--color-text-dark);
+            margin-bottom: 4px;
+        }
+
+        .notification-message {
+            font-size: 0.9rem;
+            color: var(--color-text-light);
+        }
+
+        @@keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @@keyframes slideOutRight {
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="agenda-wrapper">
+        <div class="agenda-container">
+            <!-- Header -->
+            <div class="page-header">
+                <div class="header-content">
+                    <div class="header-left">
+                        <a asp-page="/VentanaPerfil" asp-route-id="@Model.EmpleadoId" class="btn-back">
+                            <i class="fas fa-arrow-left"></i>
+                            Volver al Perfil
+                        </a>
+                        <div class="page-title">
+                            <div class="title-icon">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <span>Agenda de @Model.NombreEmpleado</span>
+                        </div>
                     </div>
-                    <button type="submit" class="btn-search">
-                        <i class="fas fa-plus"></i> Registrar
+                    <a asp-page-handler="ExportarExcel" asp-route-id="@Model.EmpleadoId" class="btn-export">
+                        <i class="fas fa-download"></i>
+                        Exportar Excel
+                    </a>
+                </div>
+            </div>
+
+            <!-- Formulario de nueva actividad -->
+            <div class="add-activity-card">
+                <div class="form-header">
+                    <div class="form-icon">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <h2 class="form-title">Registrar Nueva Actividad</h2>
+                </div>
+                <form method="post" class="form-group">
+                    <input type="text" name="NuevaActividad" placeholder="¿Qué actividad realizarás hoy?"
+                        class="input-activity" required maxlength="500" />
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-check"></i>
+                        Registrar
                     </button>
                 </form>
             </div>
-            <a asp-page-handler="ExportarExcel" asp-route-id="@Model.EmpleadoId" class="btn btn-success">
-                📥 Descargar Excel
-            </a>
-            <div class="area-bubble-wrapper is-open">
-                <div class="area-bubble-header d-flex justify-content-between align-items-center">
-                    <strong><i class="fas fa-calendar-check me-2"></i>Actividades realizadas</strong>
-                    <span class="badge rounded-pill bg-warning text-dark">@Model.ListaActividades.Count registros
-                        totales</span>
-                </div>
 
-                <div class="area-collapsible-body" style="max-height: none; padding: 25px;">
-                    @if (!Model.ListaActividades.Any())
-                    {
-                        <div class="text-center py-5">
-                            <i class="fas fa-ghost fa-3x mb-3" style="color: #cbd5e0;"></i>
-                            <p class="text-muted">No hay registros en la agenda.</p>
+            <!-- Estadísticas -->
+            <div class="stats-card">
+                <div class="stats-info">
+                    <h3> Resumen de Actividades</h3>
+                    <p>Registro completo de todas las tareas realizadas</p>
+                </div>
+                <div class="stats-badge">
+                    <span class="stats-number">@Model.ListaActividades.Count</span>
+                    <span class="stats-label">Registros</span>
+                </div>
+            </div>
+
+            <!-- Timeline de actividades -->
+            <div class="timeline-section">
+                @if (!Model.ListaActividades.Any())
+                {
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-calendar-times"></i>
                         </div>
-                    }
-                    else
+                        <p class="empty-text">
+                            No hay actividades registradas todavía.<br />
+                            ¡Comienza agregando tu primera tarea!
+                        </p>
+                    </div>
+                }
+                else
+                {
+                    @foreach (var grupo in Model.ListaActividades.GroupBy(a => a.Fecha.Date).OrderByDescending(g => g.Key))
                     {
-                        @foreach (var grupo in Model.ListaActividades.GroupBy(a => a.Fecha.Date))
-                        {
-                            <div class="day-group mb-4">
-                                @* Encabezado del día *@
-                                <div class="day-label">
-                                    <i class="far fa-clock me-1"></i>
+                        <div class="day-group">
+                            <!-- Header del día -->
+                            <div class="day-header">
+                                <div class="day-icon">
+                                    <i class="far fa-calendar"></i>
+                                </div>
+                                <h3 class="day-title">
                                     @if (grupo.Key == DateTime.Today)
                                     {
-                                        <span>Hoy</span>
+                                        <text>Hoy</text>
                                     }
                                     else if (grupo.Key == DateTime.Today.AddDays(-1))
                                     {
-
-                                        <span>Ayer</span>
+                                        <text>Ayer</text>
                                     }
                                     else
                                     {
-
                                         @grupo.Key.ToString("dddd, dd 'de' MMMM")
                                     }
-                                </div>
-
-                                <div class="timeline-container-modern">
-                                    @foreach (var item in grupo)
-                                    {
-                                        <div class="timeline-item-modern">
-                                            <div class="item-hour">@item.Fecha.ToString("HH:mm")</div>
-                                            <div class="item-card subordinate-module-modern">
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <span class="activity-text">@item.Descripcion</span>
-
-                                                    <form method="post" asp-page-handler="Eliminar">
-                                                        <input type="hidden" name="actividadId" value="@item.Id" />
-                                                        <input type="hidden" name="empleadoId" value="@Model.EmpleadoId" />
-                                                        <button type="submit" class="btn-delete-minimal" title="Eliminar actividad"
-                                                            onclick="return confirm('¿Seguro que deseas borrar este registro?')">
-                                                            <i class="fas fa-trash-alt"></i>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    }
-                                </div>
+                                </h3>
+                                <span class="day-subtitle">@grupo.Count() actividades</span>
                             </div>
-                        }
+
+                            <!-- Timeline de actividades del día -->
+                            <div class="timeline-container">
+                                @foreach (var item in grupo.OrderByDescending(a => a.Fecha))
+                                {
+                                    <div class="timeline-item">
+                                        <div class="timeline-time">
+                                            @item.Fecha.ToString("HH:mm")
+                                        </div>
+                                        <div class="activity-card">
+                                            <span class="activity-text">@item.Descripcion</span>
+                                            <form method="post" asp-page-handler="Eliminar" style="margin: 0;">
+                                                <input type="hidden" name="actividadId" value="@item.Id" />
+                                                <input type="hidden" name="empleadoId" value="@Model.EmpleadoId" />
+                                                <button type="submit" class="btn-delete" title="Eliminar actividad"
+                                                    onclick="return confirm('¿Eliminar esta actividad?')">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
                     }
-                </div>
+                }
             </div>
         </div>
-</div>
-</div>
-</div>
-</div>
-</main>
-</div>
+    </div>
+
+    <script>
+        // ============================================
+        // NOTIFICACIONES
+        // ============================================
+        @if (TempData["Success"] != null)
+            {
+                <text>
+                                                                        document.addEventListener('DOMContentLoaded', () => {
+                        mostrarNotificacion('@TempData["Success"]', 'success');
+                                                                        });
+                </text>
+        }
+
+            @if (TempData["Error"] != null)
+            {
+                <text>
+                                                                        document.addEventListener('DOMContentLoaded', () => {
+                        mostrarNotificacion('@TempData["Error"]', 'error');
+                                                                        });
+                </text>
+        }
+
+            function mostrarNotificacion(mensaje, tipo) {
+                const notification = document.createElement('div');
+                notification.className = `notification ${tipo}`;
+
+                notification.innerHTML = `
+                <div class="notification-icon">
+                    <i class="fas fa-${tipo === 'success' ? 'check' : 'exclamation-circle'}"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">
+                        ${tipo === 'success' ? '¡Éxito!' : 'Error'}
+                    </div>
+                    <div class="notification-message">${mensaje}</div>
+                </div>
+            `;
+
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.style.animation = 'slideOutRight 0.3s ease forwards';
+                    setTimeout(() => notification.remove(), 300);
+                }, 4000);
+            }
+        // VALIDACIÓN DEL FORMULARIO
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.querySelector('form');
+            const input = document.querySelector('.input-activity');
+
+            if (form && input) {
+                form.addEventListener('submit', (e) => {
+                    const value = input.value.trim();
+
+                    if (!value) {
+                        e.preventDefault();
+                        mostrarNotificacion('Por favor, escribe una descripción', 'error');
+                        input.focus();
+                        return false;
+                    }
+
+                    if (value.length < 3) {
+                        e.preventDefault();
+                        mostrarNotificacion('La descripción debe tener al menos 3 caracteres', 'error');
+                        input.focus();
+                        return false;
+                    }
+                });
+
+                // Limpiar espacios al escribir
+                input.addEventListener('blur', () => {
+                    input.value = input.value.trim();
+                });
+            }
+        });
+
+        // ============================================
+        // AUTO-SCROLL A NUEVA ACTIVIDAD
+        // ============================================
+        @if (TempData["NewActivity"] != null)
+            {
+                <text>
+                                                                        window.addEventListener('load', () => {
+                                                                            const timeline = document.querySelector('.timeline-section');
+                    if (timeline) {
+                        timeline.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                                                            }
+                                                                        });
+                </text>
+        }
+
+            // ============================================
+            // CONFIRMACIÓN DE ELIMINACIÓN MEJORADA
+            // ============================================
+            document.addEventListener('DOMContentLoaded', () => {
+                const deleteForms = document.querySelectorAll('form[asp-page-handler="Eliminar"]');
+
+                deleteForms.forEach(form => {
+                    form.addEventListener('submit', function (e) {
+                        e.preventDefault();
+
+                        const activityText = this.closest('.activity-card')
+                            ?.querySelector('.activity-text')?.textContent || 'esta actividad';
+
+                        if (confirm(`¿Estás seguro de eliminar:\n\n"${activityText}"?`)) {
+                            this.submit();
+                        }
+                    });
+                });
+            });
+    </script>
+</body>
+
+</html>

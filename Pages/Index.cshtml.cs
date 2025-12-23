@@ -1,5 +1,3 @@
-
-// Ruta: Pages/Index.cshtml.cs
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Organigrama.Pages
@@ -8,7 +6,7 @@ namespace Organigrama.Pages
     {
         public void OnGet()
         {
-            // Datos vienen embebidos en Index.cshtml por ahora (frontend-first).
+
         }
     }
 }

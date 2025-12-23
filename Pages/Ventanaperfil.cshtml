@@ -6,631 +6,1153 @@
     bool tieneCV = !string.IsNullOrWhiteSpace(Model.Empleado.CvUrl);
 }
 
-<div class="profile-page-wrapper" style="--area-primary: @colors.Primary; --area-secondary: @colors.Secondary;">
-    <div class="container py-5">
+<!DOCTYPE html>
+<html lang="es">
 
-        <a href="/Index" class="btn-regresar-custom">
-            <i class="fas fa-arrow-left"></i> Regresar al Organigrama
-        </a>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Perfil - @nombre</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        /* ============================================
+           VARIABLES Y CONFIGURACIÓN
+           ============================================ */
+        :root {
+            /* Colores dinámicos desde backend */
+            --area-primary:
+                @colors.Primary
+            ;
+            --area-secondary:
+                @colors.Secondary
+            ;
 
-        <div class="profile-card-glass shadow-2xl">
-            <div class="card-header-gradient">
-                <div class="status-badge-container">
-                    <span class="status-dot"></span>
-                    <span class="status-text">Empleado Activo</span>
+            /* Sistema de color base */
+            --color-text-dark: #1e293b;
+            --color-text-light: #64748b;
+            --color-border: #e2e8f0;
+            --color-background: #f8fafc;
+
+            /* Sombras unificadas */
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+            --shadow-xl: 0 30px 60px rgba(0, 0, 0, 0.15);
+
+            /* Transiciones */
+            --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+            /* Tipografía */
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* ============================================
+           RESET Y BASE
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--color-background);
+            color: var(--color-text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ============================================
+           CONTENEDOR PRINCIPAL
+           ============================================ */
+        .profile-wrapper {
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .profile-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ============================================
+           BOTÓN REGRESAR (Consistente con organigrama)
+           ============================================ */
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            border-radius: 16px;
+            background: white;
+            color: var(--area-primary);
+            text-decoration: none;
+            font-weight: 700;
+            border: 2px solid var(--color-border);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-base);
+            margin-bottom: 30px;
+        }
+
+        .btn-back:hover {
+            transform: translateX(-8px);
+            background: var(--area-primary);
+            color: white;
+            border-color: var(--area-primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-back i {
+            transition: transform var(--transition-base);
+        }
+
+        .btn-back:hover i {
+            transform: translateX(-4px);
+        }
+
+        /* ============================================
+           TARJETA PRINCIPAL
+           ============================================ */
+        .profile-card {
+            background: white;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--color-border);
+            animation: slideUp 0.6s var(--transition-bounce);
+        }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header con gradiente */
+        .card-header {
+            height: 160px;
+            background: linear-gradient(135deg, var(--area-primary) 0%, var(--area-secondary) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Efectos líquidos en el header */
+        .card-header::before,
+        .card-header::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .card-header::before {
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.2);
+            top: -50px;
+            right: -50px;
+        }
+
+        .card-header::after {
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.15);
+            bottom: -30px;
+            left: -30px;
+            animation-delay: -4s;
+        }
+
+        @@keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(30px, -20px) scale(1.1);
+            }
+        }
+
+        /* Status badge */
+        .status-badge {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(12px);
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+        }
+
+        @@keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+            }
+
+            50% {
+                transform: scale(1);
+                box-shadow: 0 0 0 8px rgba(74, 222, 128, 0);
+            }
+        }
+
+        .status-text {
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ============================================
+           CONTENIDO DE LA TARJETA
+           ============================================ */
+        .card-body {
+            padding: 0 60px 60px;
+        }
+
+        /* ============================================
+           AVATAR (Mejorado y consistente)
+           ============================================ */
+        .avatar-section {
+            display: flex;
+            justify-content: center;
+            margin-top: -100px;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+
+        .avatar-main {
+            width: 100%;
+            height: 100%;
+            border-radius: 50px;
+            border: 8px solid white;
+            object-fit: cover;
+            background: var(--area-secondary);
+            box-shadow: var(--shadow-xl);
+            transition: var(--transition-base);
+        }
+
+        .avatar-placeholder {
+            width: 100%;
+            height: 100%;
+            border-radius: 50px;
+            border: 8px solid white;
+            background: var(--area-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4.5rem;
+            font-weight: 900;
+            color: var(--area-primary);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .avatar-container:hover .avatar-main,
+        .avatar-container:hover .avatar-placeholder {
+            transform: scale(1.05) rotate(-2deg);
+            box-shadow: 0 0 0 8px rgba(var(--area-primary), 0.1);
+        }
+
+        /* Anillo decorativo animado */
+        .avatar-ring {
+            position: absolute;
+            inset: -15px;
+            border: 3px dashed var(--area-primary);
+            border-radius: 60px;
+            opacity: 0.3;
+            animation: spin 30s linear infinite;
+        }
+
+        @@keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ============================================
+           INFORMACIÓN PERSONAL
+           ============================================ */
+        .info-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .area-label {
+            display: inline-block;
+            color: var(--area-primary);
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            padding: 4px 16px;
+            background: var(--area-secondary);
+            border-radius: 20px;
+        }
+
+        .display-name {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            color: var(--color-text-dark);
+            margin: 10px 0;
+            letter-spacing: -1.5px;
+            line-height: 1.1;
+        }
+
+        .role-text {
+            font-size: 1.3rem;
+            color: var(--color-text-light);
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        /* Pills de información */
+        .info-pills {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .info-pill {
+            background: var(--color-background);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--color-text-dark);
+            border: 2px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-base);
+        }
+
+        .info-pill:hover {
+            background: white;
+            border-color: var(--area-primary);
+            color: var(--area-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .info-pill i {
+            opacity: 0.7;
+        }
+
+        /* ============================================
+           SECCIÓN DE DOCUMENTOS Y AGENDA
+           ============================================ */
+        .documents-section {
+            background: var(--color-background);
+            border-radius: 24px;
+            padding: 40px;
+            border: 2px solid var(--color-border);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--area-primary);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+        }
+
+        .section-title {
+            flex: 1;
+        }
+
+        .section-title h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--color-text-dark);
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: var(--color-text-light);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* Grid de contenido */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Tarjeta de Agenda */
+        .agenda-card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            border-left: 5px solid #ed8936;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-base);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .agenda-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .agenda-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .agenda-icon {
+            width: 45px;
+            height: 45px;
+            background: #ed8936;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .agenda-info h4 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--color-text-dark);
+            margin: 0;
+        }
+
+        .agenda-info span {
+            font-size: 0.85rem;
+            color: var(--color-text-light);
+        }
+
+        .btn-agenda {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: #ed8936;
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 700;
+            transition: var(--transition-base);
+        }
+
+        .btn-agenda:hover {
+            background: #c05621;
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(237, 137, 54, 0.4);
+        }
+
+        /* Tarjeta de CV */
+        .cv-card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .cv-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* ============================================
+           BOTONES DE ACCIÓN
+           ============================================ */
+        .btn-action {
+            flex: 1;
+            min-width: 140px;
+            padding: 12px 20px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: var(--transition-base);
+        }
+
+        .btn-primary {
+            background: var(--area-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--area-primary);
+            border: 2px solid var(--area-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--area-secondary);
+            transform: translateY(-2px);
+        }
+
+        /* Botones de icono */
+        .btn-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--color-border);
+            background: white;
+            cursor: pointer;
+            transition: var(--transition-base);
+            position: relative;
+        }
+
+        .btn-icon:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-icon.external {
+            color: var(--color-text-light);
+        }
+
+        .btn-icon.external:hover {
+            color: var(--area-primary);
+            border-color: var(--area-primary);
+            background: var(--area-secondary);
+        }
+
+        .btn-icon.delete {
+            color: #e11d48;
+            border-color: #fecdd3;
+            background: #fff1f2;
+        }
+
+        .btn-icon.delete:hover {
+            background: #e11d48;
+            color: white;
+            border-color: #e11d48;
+        }
+
+        /* ============================================
+           MODAL DE VISUALIZACIÓN
+           ============================================ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 1100px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            animation: slideUpModal 0.4s var(--transition-bounce);
+        }
+
+        @@keyframes slideUpModal {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            padding: 25px 35px;
+            background: var(--color-background);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .modal-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--color-text-dark);
+        }
+
+        .modal-title i {
+            color: #e11d48;
+            font-size: 1.4rem;
+        }
+
+        .btn-close-modal {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: none;
+            background: white;
+            color: var(--color-text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition-base);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-close-modal:hover {
+            background: #e11d48;
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 0;
+        }
+
+        .modal-body iframe {
+            width: 100%;
+            height: 75vh;
+            border: none;
+        }
+
+        /* ============================================
+           TOOLTIPS PERSONALIZADOS
+           ============================================ */
+        .tooltip-custom {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 99999;
+            pointer-events: none;
+            transform: translateX(-50%);
+            box-shadow: var(--shadow-md);
+            animation: tooltipIn 0.2s ease;
+        }
+
+        .tooltip-custom::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            background: rgba(15, 23, 42, 0.95);
+            transform: translateX(-50%) rotate(45deg);
+        }
+
+        @@keyframes tooltipIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .tooltip-custom.fade-out {
+            animation: tooltipOut 0.15s ease forwards;
+        }
+
+        @@keyframes tooltipOut {
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-5px);
+            }
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @@media (max-width: 992px) {
+            .card-body {
+                padding: 0 30px 40px;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .documents-section {
+                padding: 30px 20px;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .profile-wrapper {
+                padding: 20px 10px;
+            }
+
+            .card-header {
+                height: 120px;
+            }
+
+            .avatar-section {
+                margin-top: -80px;
+            }
+
+            .avatar-container {
+                width: 160px;
+                height: 160px;
+            }
+
+            .display-name {
+                font-size: 2rem;
+            }
+
+            .info-pills {
+                flex-direction: column;
+            }
+
+            .cv-actions {
+                flex-direction: column;
+            }
+
+            .btn-action {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="profile-wrapper">
+        <div class="profile-container">
+            <!-- Botón de regreso -->
+            <a href="/Index" class="btn-back">
+                <i class="fas fa-arrow-left"></i>
+                Volver al Organigrama
+            </a>
+
+            <!-- Tarjeta principal -->
+            <div class="profile-card">
+                <!-- Header con gradiente -->
+                <div class="card-header">
+                    <div class="status-badge">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Empleado Activo</span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="card-body-content">
-                <div class="row">
-                    <div class="col-lg-3 text-center">
-                        <div class="avatar-wrapper">
+                <!-- Contenido -->
+                <div class="card-body">
+                    <!-- Avatar -->
+                    <div class="avatar-section">
+                        <div class="avatar-container">
                             @if (!string.IsNullOrEmpty(Model.Empleado.Foto))
                             {
-                                <img src="@Model.Empleado.Foto" alt="Perfil">
+                                <img src="@Model.Empleado.Foto" alt="@nombre" class="avatar-main" />
                             }
                             else
                             {
-                                <div class="avatar-placeholder">@(nombre.Substring(0, 1).ToUpper())</div>
+                                <div class="avatar-placeholder">
+                                    @nombre.Substring(0, 1).ToUpper()
+                                </div>
                             }
                             <div class="avatar-ring"></div>
                         </div>
                     </div>
-                    <div class="col-lg-9 text-center text-lg-start">
-                        <div class="info-container pt-lg-4">
-                            <span class="area-label">@Model.Empleado.Area</span>
-                            <h1 class="display-name">@Model.Empleado.Nombre</h1>
-                            <p class="role-text">@Model.Empleado.Puesto</p>
 
-                            <div class="pills-container justify-content-center justify-content-lg-start">
-                                <div class="glass-pill"><i class="far fa-envelope me-2"></i> @Model.Empleado.Email</div>
-                                <div class="glass-pill"><i class="far fa-id-card me-2"></i> ID: #@Model.Empleado.Id
+                    <!-- Información personal -->
+                    <div class="info-section">
+                        <span class="area-label">@Model.Empleado.Area</span>
+                        <h1 class="display-name">@Model.Empleado.Nombre</h1>
+                        <p class="role-text">@Model.Empleado.Puesto</p>
+
+                        <div class="info-pills">
+                            <div class="info-pill">
+                                <i class="far fa-envelope"></i>
+                                @Model.Empleado.Email
+                            </div>
+                            <div class="info-pill">
+                                <i class="far fa-id-card"></i>
+                                ID: #@Model.Empleado.Id
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección de documentos y agenda -->
+                    <div class="documents-section">
+                        <div class="section-header">
+                            <div class="section-icon">
+                                <i class="fas fa-folder-open"></i>
+                            </div>
+                            <div class="section-title">
+                                <h3>Expediente Digital</h3>
+                                <p>Gestiona los documentos y actividades del empleado</p>
+                            </div>
+                        </div>
+
+                        <div class="content-grid">
+                            <!-- Tarjeta de Agenda -->
+                            <div class="agenda-card">
+                                <div class="agenda-header">
+                                    <div class="agenda-icon">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                    <div class="agenda-info">
+                                        <h4>Agenda de Actividades</h4>
+                                        <span>Registro diario y bitácora</span>
+                                    </div>
+                                </div>
+                                <a href="/Agenda/@Model.Empleado.Id" class="btn-agenda">
+                                    Abrir Agenda
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+
+                            <!-- Tarjeta de CV -->
+                            <div class="cv-card">
+                                <div class="agenda-header">
+                                    <div class="agenda-icon" style="background: var(--area-primary);">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </div>
+                                    <div class="agenda-info">
+                                        <h4>Currículum Vitae</h4>
+                                        <span>@(tieneCV ? "Documento cargado" : "Sin documento")</span>
+                                    </div>
+                                </div>
+
+                                <div class="cv-actions">
+                                    <!-- Botón subir/actualizar -->
+                                    <form method="post" asp-page-handler="UploadCV" asp-route-id="@Model.Empleado.Id"
+                                        enctype="multipart/form-data" id="uploadForm" style="flex: 1;">
+                                        <input type="file" asp-for="ArchivoCV" id="cvInput" hidden accept=".pdf"
+                                            onchange="document.getElementById('uploadForm').submit()" />
+                                        <button type="button" class="btn-action btn-secondary" style="width: 100%;"
+                                            onclick="document.getElementById('cvInput').click()">
+                                            <i class="fas fa-upload"></i>
+                                            @(tieneCV ? "Actualizar" : "Subir CV")
+                                        </button>
+                                    </form>
+
+                                    @if (tieneCV)
+                                    {
+                                        <!-- Botón vista previa -->
+                                        <button type="button" class="btn-action btn-primary" onclick="abrirModal()">
+                                            <i class="fas fa-eye"></i>
+                                            Ver CV
+                                        </button>
+
+                                        <!-- Botón abrir en nueva pestaña -->
+                                        <a href="/uploads/cvs/@Model.Empleado.CvUrl" target="_blank"
+                                            class="btn-icon external" data-tooltip="Abrir en nueva pestaña">
+                                            <i class="fas fa-external-link-alt"></i>
+                                        </a>
+
+                                        <!-- Botón eliminar -->
+                                        <form method="post" asp-page-handler="DeleteCV" asp-route-id="@Model.Empleado.Id"
+                                            onsubmit="return confirm('¿Eliminar el CV definitivamente?')">
+                                            <button type="submit" class="btn-icon delete" data-tooltip="Eliminar CV">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    }
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="cv-section-modern mt-5">
-                    <div class="cv-card-inne flex-column flex-xl-row gap-4">
-                        <div class="cv-info">
-                            <h3 class="mb-1">Expediente Digital</h3>
-                            <p class="text-muted mb-0">Documentación oficial cargada en el sistema.</p>
-                        </div>
-
-                        <div class="agenda-box-highlight d-flex align-items-center gap-3">
-                            <div class="icon-circle">
-                                <i class="fas fa-calendar-alt"></i>
-                            </div>
-                            <div style="flex:1">
-                                <strong class="agenda-title">Agenda de Actividades</strong>
-                                <span class="agenda-subtitle">Registro diario de tareas y bitácora</span>
-                            </div>
-                            <a href="/Agenda/@Model.Empleado.Id" class="btn-agenda-link">
-                                Abrir <i class="fas fa-chevron-right ms-1"></i>
-                            </a>
-                        </div>
-
-
-                        <div class="cv-actions-grid justify-content-center">
-                            <form method="post" asp-page-handler="UploadCV" asp-route-id="@Model.Empleado.Id"
-                                enctype="multipart/form-data" id="uploadForm">
-                                <input type="file" asp-for="ArchivoCV" id="cvInput" hidden accept=".pdf"
-                                    onchange="document.getElementById('uploadForm').submit()">
-                                <button type="button" class="action-btn upload-btn"
-                                    onclick="document.getElementById('cvInput').click()">
-                                    <i class="fas fa-upload"></i> @(tieneCV ? "Actualizar CV" : "Subir CV")
-                                </button>
-                            </form>
-
-                            @if (tieneCV)
-                            {
-
-                                <button type="button" class="action-btn view-btn" onclick="mostrarModalCV()">
-                                    <i class="fas fa-eye"></i> Vista Previa
-                                </button>
-
-                                <a href="/uploads/cvs/@Model.Empleado.CvUrl" target="_blank" class="icon-btn-glass"
-                                    data-tippy-content="Abrir en pestaña nueva">
-                                    <i class="fas fa-external-link-alt"></i>
-                                </a>
-
-                                <form method="post" asp-page-handler="DeleteCV" asp-route-id="@Model.Empleado.Id"
-                                    onsubmit="return confirm('¿Borrar definitivamente el CV?')">
-                                    <button type="submit" class="icon-btn-delete" data-tippy-content="Eliminar CV">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
-                            }
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div id="modalVisualizador" class="modal-full-overlay">
-    <div class="modal-container-white">
-        <div class="modal-header-top">
-            <span><i class="fas fa-file-pdf" style="color: #e11d48;"></i> Previsualización</span>
-            <button type="button" class="btn-cerrar-modal" onclick="ocultarModalCV()">&times;</button>
-        </div>
-        <div class="modal-body-pdf">
-            @if (tieneCV)
-            {
-                <iframe src="/uploads/cvs/@Model.Empleado.CvUrl#toolbar=0" id="iframePDF"></iframe>
-            }
+    <!-- Modal de visualización de PDF -->
+    <div id="pdfModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-file-pdf"></i>
+                    Previsualización del CV
+                </div>
+                <button type="button" class="btn-close-modal" onclick="cerrarModal()">
+                    ×
+                </button>
+            </div>
+            <div class="modal-body">
+                @if (tieneCV)
+                {
+                    <iframe src="/uploads/cvs/@Model.Empleado.CvUrl#toolbar=0" id="pdfFrame"></iframe>
+                }
+            </div>
         </div>
     </div>
-</div>
 
-</div>
-
-<style>
-    :root {
-        --area-primary: #5A67D8;
-        --area-secondary: #EEF0FA;
-    }
-
-    .profile-page-wrapper {
-        background: #f1f5f9;
-        min-height: 100vh;
-        font-family: 'Inter', sans-serif;
-    }
-
-    /* BOTÓN REGRESAR */
-    .btn-regresar-custom {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        background: white;
-        color: var(--area-primary);
-        padding: 10px 22px;
-        border-radius: 12px;
-        font-weight: 700;
-        text-decoration: none !important;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        border: 1px solid #e2e8f0;
-        margin-bottom: 25px;
-        transition: all 0.3s ease;
-    }
-
-    .btn-regresar-custom:hover {
-        transform: translateX(-5px);
-        background: var(--area-primary);
-        color: white;
-        box-shadow: 0 6px 15px rgba(90, 103, 216, 0.3);
-    }
-
-    /* CARD PRINCIPAL */
-    .profile-card-glass {
-        background: white;
-        border-radius: 40px;
-        border: 1px solid #e2e8f0;
-        overflow: hidden;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
-        position: relative;
-    }
-
-    .card-header-gradient {
-        background: linear-gradient(135deg, var(--area-primary), var(--area-secondary));
-        height: 140px;
-        position: relative;
-    }
-
-    .card-body-content {
-        padding: 0 50px 50px 50px;
-    }
-
-    /* AVATAR AJUSTADO */
-    .avatar-wrapper {
-        position: relative;
-        width: 180px;
-        height: 180px;
-        margin: -90px auto 20px;
-        z-index: 20;
-    }
-
-    .avatar-wrapper img,
-    .avatar-placeholder {
-        width: 100%;
-        height: 100%;
-        border-radius: 45px;
-        border: 8px solid white;
-        object-fit: cover;
-        background: #f8fafc;
-        position: relative;
-        z-index: 5;
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-    }
-
-    .avatar-placeholder {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 4rem;
-        color: var(--area-primary);
-        font-weight: 800;
-    }
-
-    .avatar-ring {
-        position: absolute;
-        inset: -12px;
-        border: 3px dashed var(--area-primary);
-        border-radius: 55px;
-        animation: spin 30s linear infinite;
-        opacity: 0.3;
-    }
-
-    /* INFORMACIÓN PERSONAL */
-    .display-name {
-        font-weight: 900;
-        font-size: clamp(1.8rem, 5vw, 3rem);
-        color: #1e293b;
-        margin: 5px 0;
-        letter-spacing: -1px;
-        line-height: 1.1;
-    }
-
-    .role-text {
-        font-size: 1.2rem;
-        color: #64748b;
-        margin-bottom: 15px;
-    }
-
-    .area-label {
-        color: var(--area-primary);
-        font-weight: 800;
-        letter-spacing: 2px;
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        display: block;
-    }
-
-    .pills-container {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-
-    .glass-pill {
-        background: #f8fafc;
-        padding: 8px 18px;
-        border-radius: 50px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #475569;
-        border: 1px solid #e2e8f0;
-        transition: 0.2s;
-    }
-
-    .glass-pill:hover {
-        background: white;
-        border-color: var(--area-primary);
-        color: var(--area-primary);
-    }
-
-    /* SECCIÓN CV Y AGENDA */
-    .cv-card-inner {
-        background: #f8fafc;
-        padding: 30px;
-        border-radius: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border: 1px solid #edf2f7;
-    }
-
-    .agenda-box-highlight {
-        background: white;
-        padding: 20px 25px;
-        border-radius: 20px;
-        border-left: 5px solid #ed8936;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
-        min-width: 320px;
-        transition: all 0.3s ease;
-    }
-
-    .agenda-box-highlight:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(237, 137, 54, 0.15);
-    }
-
-    .btn-agenda-link {
-        background: #ed8936;
-        color: white;
-        padding: 8px 15px;
-        border-radius: 10px;
-        font-weight: 700;
-        font-size: 0.8rem;
-        text-decoration: none !important;
-        transition: 0.3s;
-    }
-
-    .btn-agenda-link:hover {
-        background: #c05621;
-        box-shadow: 0 4px 12px rgba(237, 137, 54, 0.4);
-    }
-
-    .agenda-title {
-        display: block;
-        font-size: 1.15rem;
-        font-weight: 800;
-        color: #1e293b;
-        margin-bottom: 4px;
-        line-height: 1;
-    }
-
-    .agenda-subtitle {
-        display: block;
-        font-size: 0.85rem;
-        color: #64748b;
-        font-weight: 500;
-        line-height: 2.5;
-    }
-
-    /* BOTONES DE ACCIÓN */
-    .cv-actions-grid {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    .action-btn {
-        padding: 12px 20px;
-        border-radius: 14px;
-        border: none;
-        font-weight: 700;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .view-btn {
-        background: var(--area-primary);
-        color: white;
-        margin-top: 20px;
-    }
-
-    .view-btn:hover {
-        background: #434190;
-        filter: brightness(1.1);
-        transform: translateY(-2px);
-    }
-
-    .upload-btn {
-        background: white;
-        border: 2px solid var(--area-primary);
-        color: var(--area-primary);
-        margin-top: 20px;
-    }
-
-    .upload-btn:hover {
-        background: var(--area-secondary);
-        color: var(--area-primary);
-        transform: translateY(-2px);
-    }
-
-    .icon-btn-glass,
-    .icon-btn-delete {
-        width: 45px;
-        height: 45px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-        border: 1px solid #e2e8f0;
-        cursor: pointer;
-        margin-top: 20px;
-    }
-
-    .icon-btn-glass {
-        background: white;
-        color: #64748b;
-        text-decoration: none;
-    }
-
-    .icon-btn-glass:hover {
-        background: #f1f5f9;
-        color: var(--area-primary);
-        border-color: var(--area-primary);
-    }
-
-    .icon-btn-delete {
-        background: #fff1f2;
-        color: #e11d48;
-        border-color: #fecdd3;
-    }
-
-    .icon-btn-delete:hover {
-        background: #e11d48;
-        color: white;
-        box-shadow: 0 4px 12px rgba(225, 29, 72, 0.3);
-    }
-
-    /* STATUS BADGE */
-    .status-badge-container {
-        position: absolute;
-        top: 25px;
-        right: 30px;
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
-        padding: 8px 16px;
-        border-radius: 50px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .status-dot {
-        width: 10px;
-        height: 10px;
-        background: #4ade80;
-        border-radius: 50%;
-        animation: pulse-green 2s infinite;
-    }
-
-    .status-text {
-        color: white;
-        font-size: 0.7rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    /* MODAL */
-    .modal-full-overlay {
-        display: none;
-        position: fixed;
-        inset: 0;
-        z-index: 9999;
-        background: rgba(15, 23, 42, 0.8);
-        backdrop-filter: blur(8px);
-        align-items: center;
-        justify-content: center;
-        padding: 30px;
-    }
-
-    .btn-cerrar-modal {
-        transition: all 0.3s;
-    }
-
-    .btn-cerrar-modal:hover {
-        background: #e11d48;
-        color: white;
-        transform: rotate(360deg);
-        border-radius: 20px;
-    }
-
-    .modal-container-white {
-        background: white;
-        width: 100%;
-        max-width: 1000px;
-        border-radius: 30px;
-        overflow: hidden;
-    }
-
-    .modal-header-top {
-        padding: 20px 30px;
-        background: #f8fafc;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    #iframePDF {
-        width: 100%;
-        height: 75vh;
-        border: none;
-    }
-
-    /* ANIMACIONES */
-    @@keyframes spin {
-        from {
-            transform: rotate(0deg);
+    <script>
+        // ============================================
+        // GESTIÓN DEL MODAL
+        // ============================================
+        function abrirModal() {
+            const modal = document.getElementById('pdfModal');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         }
 
-        to {
-            transform: rotate(360deg);
-        }
-    }
-
-    @@keyframes pulse-green {
-        0% {
-            transform: scale(0.95);
-            box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+        function cerrarModal() {
+            const modal = document.getElementById('pdfModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
         }
 
-        70% {
-            transform: scale(1);
-            box-shadow: 0 0 0 10px rgba(74, 222, 128, 0);
-        }
+        // Cerrar modal al hacer clic fuera
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('pdfModal');
+            if (e.target === modal) {
+                cerrarModal();
+            }
+        });
 
-        100% {
-            transform: scale(0.95);
-            box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
-        }
-    }
+        // Cerrar modal con tecla ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                cerrarModal();
+            }
+        });
 
-    /* RESPONSIVE */
-    @@media (max-width: 991px) {
-        .card-body-content {
-            padding: 0 30px 40px 30px;
-        }
+        // ============================================
+        // SISTEMA DE TOOLTIPS
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            const tooltipElements = document.querySelectorAll('[data-tooltip]');
 
-        .display-name {
-            font-size: 2.2rem;
-        }
+            tooltipElements.forEach(element => {
+                let tooltip = null;
 
-        .cv-card-inner {
-            padding: 20px;
-            flex-direction: column;
-            gap: 20px;
-        }
-    }
+                element.addEventListener('mouseenter', (e) => {
+                    const text = element.getAttribute('data-tooltip');
+                    if (!text) return;
 
-    /* Tooltip generado por JS */
-    .js-custom-tooltip {
-        position: absolute;
-        background: #00205383;
-        backdrop-filter: blur(9px);
-        color: white;
-        padding: 6px 14px;
-        border-radius: 8px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        z-index: 99999;
-        pointer-events: none;
-        transform: translateX(-50%);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
-        animation: tooltip-in 0.2s ease-out forwards;
-    }
+                    // Crear tooltip
+                    tooltip = document.createElement('div');
+                    tooltip.className = 'tooltip-custom';
+                    tooltip.textContent = text;
+                    document.body.appendChild(tooltip);
 
-    .js-custom-tooltip.fade-out {
-        animation: tooltip-out 0.15s ease-in forwards;
-    }
+                    // Posicionar
+                    const rect = element.getBoundingClientRect();
+                    tooltip.style.top = `${rect.top + window.scrollY - 45}px`;
+                    tooltip.style.left = `${rect.left + (rect.width / 2)}px`;
+                });
 
-    @@keyframes tooltip-in {
-        from {
-            opacity: 0;
-            transform: translateX(-50%) translateY(5px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-    }
-
-    @@keyframes tooltip-out {
-        from {
-            opacity: 1;
-        }
-
-        to {
-            opacity: 0;
-        }
-    }
-
-    /* Limpieza de márgenes para alineación */
-    .icon-btn-glass,
-    .icon-btn-delete {
-        margin: 0 !important;
-    }
-
-    .cv-actions-grid {
-        gap: 12px;
-    }
-</style>
-
-<script>
-    function mostrarModalCV() {
-        document.getElementById('modalVisualizador').style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    }
-
-    function ocultarModalCV() {
-        document.getElementById('modalVisualizador').style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
-
-    window.onclick = function (e) {
-        if (e.target == document.getElementById('modalVisualizador')) ocultarModalCV();
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const tooltips = document.querySelectorAll('[data-tippy-content]');
-
-        tooltips.forEach(el => {
-            let tooltipBox;
-
-            el.addEventListener('mouseenter', (e) => {
-                // Crear el elemento del tooltip
-                tooltipBox = document.createElement('div');
-                tooltipBox.className = 'js-custom-tooltip';
-                tooltipBox.innerText = el.getAttribute('data-tippy-content');
-                document.body.appendChild(tooltipBox);
-
-                // Posicionamiento dinámico
-                const rect = el.getBoundingClientRect();
-                tooltipBox.style.top = (rect.top + window.scrollY - 45) + 'px';
-                tooltipBox.style.left = (rect.left + (rect.width / 2)) + 'px';
-            });
-
-            el.addEventListener('mouseleave', () => {
-                if (tooltipBox) {
-                    tooltipBox.classList.add('fade-out');
-                    setTimeout(() => tooltipBox.remove(), 150);
-                }
+                element.addEventListener('mouseleave', () => {
+                    if (tooltip) {
+                        tooltip.classList.add('fade-out');
+                        setTimeout(() => tooltip.remove(), 150);
+                        tooltip = null;
+                    }
+                });
             });
         });
-    });
 
-</script>
+        // ============================================
+        // ANIMACIONES DE ENTRADA
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animación de las cards con delay
+            const cards = document.querySelectorAll('.agenda-card, .cv-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+
+        // ============================================
+        // VALIDACIÓN DE ARCHIVO
+        // ============================================
+        const cvInput = document.getElementById('cvInput');
+        if (cvInput) {
+            cvInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                // Validar tipo
+                if (!file.name.endsWith('.pdf')) {
+                    alert('Solo se permiten archivos PDF');
+                    e.target.value = '';
+                    return;
+                }
+
+                // Validar tamaño (10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('El archivo no debe superar los 10MB');
+                    e.target.value = '';
+                    return;
+                }
+            });
+        }
+
+        // ============================================
+        // MENSAJES DE FEEDBACK
+        // ============================================
+        @if (TempData["Success"] != null)
+            {
+                <text>
+                                                                                                                                                                window.addEventListener('DOMContentLoaded', () => {
+                        mostrarNotificacion('@TempData["Success"]', 'success');
+                                                                                                                                                                });
+                </text>
+        }
+
+            @if (TempData["Error"] != null)
+            {
+                <text>
+                                                                                                                                                                window.addEventListener('DOMContentLoaded', () => {
+                        mostrarNotificacion('@TempData["Error"]', 'error');
+                                                                                                                                                                });
+                </text>
+        }
+
+            function mostrarNotificacion(mensaje, tipo) {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${tipo === 'success' ? '#10b981' : '#ef4444'};
+                color: white;
+                padding: 16px 24px;
+                border-radius: 12px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+                z-index: 99999;
+                font-weight: 600;
+                animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            `;
+                notification.innerHTML = `
+                <i class="fas fa-${tipo === 'success' ? 'check-circle' : 'exclamation-circle'}" 
+                   style="margin-right: 10px;"></i>
+                ${mensaje}
+            `;
+
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.style.animation = 'slideOutRight 0.3s ease forwards';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+
+        // Animaciones para notificaciones
+        const style = document.createElement('style');
+        style.textContent = `
+            @@keyframes slideInRight {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @@keyframes slideOutRight {
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+
+</html>

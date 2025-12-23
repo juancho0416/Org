@@ -519,5 +519,5 @@ C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva c
 C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Org\obj\Debug\net9.0\Organigrama.pdb
 C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Org\obj\Debug\net9.0\Organigrama.genruntimeconfig.cache
 C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Org\obj\Debug\net9.0\ref\Organigrama.dll
-C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Org\obj\Debug\net9.0\compressed\efj3a2zml3-mdsxtx2a5y.gz
-C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Org\obj\Debug\net9.0\compressed\agqwvau54p-33pzgl1gh0.gz
+C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Org\obj\Debug\net9.0\compressed\efj3a2zml3-79r8gfq8dv.gz
+C:\Users\jmartinezg\OneDrive - Comisión Nacional de Energía\Escritorio\Nueva carpeta\Org\obj\Debug\net9.0\compressed\agqwvau54p-um674rujda.gz

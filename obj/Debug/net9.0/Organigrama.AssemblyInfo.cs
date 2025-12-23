@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Organigrama")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b8058af5d62208567206b765f192cb9907bbe41a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fdb1774564722ad6756b7505f351e99b94dc6330")]
 [assembly: System.Reflection.AssemblyProductAttribute("Organigrama")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Organigrama")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
