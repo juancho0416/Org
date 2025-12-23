@@ -1,12 +1,4 @@
-/**
- * ORGANIGRAMA LÍQUIDO - CSS OPTIMIZADO
- * Eliminación de duplicados y mejor organización
- */
-
-/* ============================================
-   1. VARIABLES Y CONFIGURACIÓN BASE
-   ============================================ */
-
+/*1. VARIABLES Y CONFIGURACIÓN BASE*/
 :root {
     /* Colores principales */
     --color-primary-default: #4C51BF;
@@ -29,7 +21,7 @@
     --area-color-3-secondary: #E6FFFA;
     --area-color-4-primary: #DD6B20;
     --area-color-4-secondary: #FFFAF0;
-    --area-color-5-primary: #ff0084;
+    --area-color-5-primary: #D53F8C;
     --area-color-5-secondary: #FFF5F7;
     --area-color-8-primary: #44337A;
     --area-color-8-secondary: #F3F0FF;
@@ -49,10 +41,7 @@
     --transition-bounce: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* ============================================
-   2. RESET Y BASE
-   ============================================ */
-
+/*2. RESET Y BASE*/
 body {
     background-color: var(--color-background);
     font-family: var(--font-family);
@@ -60,7 +49,6 @@ body {
     color: var(--color-text-dark);
     line-height: 1.6;
 }
-
 /* Accesibilidad: foco visible */
 button:focus,
 .btn-view:focus,
@@ -75,9 +63,7 @@ select:focus {
     box-shadow: 0 0 0 4px rgba(90,103,216,0.06);
 }
 
-/* ============================================
-   3. CONTENEDOR PRINCIPAL
-   ============================================ */
+/*3. CONTENEDOR PRINCIPAL*/
 
 .org-container {
     max-width: 1300px;
@@ -85,9 +71,7 @@ select:focus {
     padding: 0 30px;
 }
 
-/* ============================================
-   4. FOTOS DE PERFIL
-   ============================================ */
+/*4. FOTOS DE PERFIL*/
 
 .profile-pic-container {
     --size: 60px;
@@ -101,8 +85,10 @@ select:focus {
     justify-content: center;
     background: #fff;
     flex-shrink: 0;
-    transition: var(--transition-base);
+    transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+
 }
+
 
 .profile-pic {
     width: 100%;
@@ -124,7 +110,7 @@ select:focus {
 }
 
 .profile-pic-container:hover {
-    animation: pulseAvatar 0.7s cubic-bezier(.4,0,.2,1);
+    animation: pulseAvatar 0.7s cubic-bezier(.4,0,.2,1) forwards; 
     box-shadow: 0 0 0 6px rgba(90,103,216,0.13);
     transform: scale(1.07);
 }
@@ -144,9 +130,7 @@ select:focus {
     }
 }
 
-/* ============================================
-   5. MÓDULO DEL JEFE (CHIEF)
-   ============================================ */
+/*5. MÓDULO DEL JEFE (CHIEF)*/
 
 .chief-wrapper {
     display: flex;
@@ -293,9 +277,7 @@ select:focus {
     }
 }
 
-/* ============================================
-   6. CONTROLES Y VISTA
-   ============================================ */
+/*6. CONTROLES Y VISTA*/
 
 .subordinate-controls {
     display: flex;
@@ -367,9 +349,7 @@ select:focus {
     transform: scaleX(1.12) scaleY(0.9);
 }
 
-/* ============================================
-   7. BURBUJAS DE ÁREA
-   ============================================ */
+/*7. BURBUJAS DE ÁREA*/
 
 .areas-container-modern {
     display: flex;
@@ -481,9 +461,7 @@ select:focus {
     padding: 15px 20px;
 }
 
-/* ============================================
-   8. JERARQUÍA INTERNA
-   ============================================ */
+/*8. JERARQUÍA INTERNA*/
 
 .internal-hierarchy-flow {
     position: relative;
@@ -539,9 +517,7 @@ select:focus {
     margin-top: 10px;
 }
 
-/* ============================================
-   9. TARJETAS DE SUBORDINADOS
-   ============================================ */
+/*9. TARJETAS DE SUBORDINADOS*/
 
 .subordinate-module-modern {
     background: rgba(255, 255, 255, 0.95);
@@ -619,9 +595,7 @@ select:focus {
     }
 }
 
-/* ============================================
-   10. VISTA DIAGRAMA
-   ============================================ */
+/*10. VISTA DIAGRAMA*/
 
 .org-tree-container {
     width: 100%;
@@ -748,9 +722,7 @@ select:focus {
     font-size: 0.6rem;
 }
 
-/* ============================================
-   11. EFECTOS VISUALES
-   ============================================ */
+/* 11. EFECTOS VISUALES*/
 
 /* Ripple effect */
 .ripple {
@@ -807,9 +779,7 @@ select:focus {
     opacity: 1;
 }
 
-/* ============================================
-   12. BÚSQUEDA Y CONTROLES
-   ============================================ */
+/*12. BÚSQUEDA Y CONTROLES*/
 
 .control-group {
     display: grid;
@@ -869,9 +839,7 @@ select:focus {
     box-shadow: 0 4px 12px rgba(76, 81, 191, 0.3);
 }
 
-/* ============================================
-   13. RESPONSIVE
-   ============================================ */
+/*13. RESPONSIVE*/
 
 @media (max-width: 768px) {
     .org-container {
@@ -896,9 +864,7 @@ select:focus {
     }
 }
 
-/* ============================================
-   14. UTILIDADES
-   ============================================ */
+/*14. UTILIDADADES */
 
 .avatar-ring {
     position: absolute;
@@ -938,5 +904,38 @@ select:focus {
     to {
         opacity: 1;
         transform: scale(1);
+    }
+}
+
+
+
+
+
+
+
+.profile-pic-container {
+    /* ... tus otras propiedades ... */
+    transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+}
+
+.profile-pic-container:hover {
+    /* Cambiamos 'infinite' si quieres que sea constante o lo dejamos una vez */
+    animation: pulseAvatar 0.7s cubic-bezier(.4,0,.2,1) forwards; 
+    /* Eliminamos el transform: scale(1.07) de aquí porque ya está en el keyframe */
+    /* Eliminamos el box-shadow de aquí porque ya está en el keyframe */
+}
+
+@keyframes pulseAvatar {
+    0% {
+        box-shadow: 0 0 0 0 rgba(90,103,216,0.18);
+        transform: scale(1);
+    }
+    60% {
+        box-shadow: 0 0 0 12px rgba(90,103,216,0.08);
+        transform: scale(1.09); /* Un poco más grande en el pico del pulso */
+    }
+    100% {
+        box-shadow: 0 0 0 6px rgba(90,103,216,0.13); /* Valor final igual al hover deseado */
+        transform: scale(1.07); /* Valor final igual al hover deseado */
     }
 }

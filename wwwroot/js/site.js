@@ -1,12 +1,4 @@
-﻿/**
- * MOTOR DE ORGANIGRAMA LÍQUIDO PRO 2025 - OPTIMIZADO
- * Mejoras: Código más limpio, mejor rendimiento, menos redundancia
- */
-
-// ============================================
-// 1. CONFIGURACIÓN Y CONSTANTES
-// ============================================
-
+﻿// 1. CONFIGURACIÓN Y CONSTANTES
 const CONFIG = {
     CHIEF_ID_FIELD: 'jefeId',
     API_URL: '/api/empleado/todos',
@@ -14,11 +6,7 @@ const CONFIG = {
     SEARCH_MIN_LENGTH: 3,
     ANIMATION_DURATION: 600,
 };
-
-// ============================================
 // 2. GESTIÓN DE COLORES (Optimizada)
-// ============================================
-
 const ColorManager = (() => {
     const colors = [];
     const assignedColors = new Map();
@@ -64,10 +52,7 @@ const ColorManager = (() => {
     return { getColors };
 })();
 
-// ============================================
 // 3. ESTADO GLOBAL (Mejor organizado)
-// ============================================
-
 const State = {
     employees: new Map(),
     root: null,
@@ -79,11 +64,7 @@ const State = {
         listContainer: null
     }
 };
-
-// ============================================
 // 4. UTILIDADES DOM
-// ============================================
-
 const DOM = {
     create: (tag, className = '', text = null) => {
         const el = document.createElement(tag);
@@ -119,9 +100,7 @@ const DOM = {
     }
 };
 
-// ============================================
 // 5. EFECTOS VISUALES
-// ============================================
 
 const Effects = {
     splashParticles: (x, y, color) => {
@@ -167,9 +146,7 @@ const Effects = {
     }
 };
 
-// ============================================
 // 6. COMPONENTES UI
-// ============================================
 
 const Components = {
     createProfilePicture: (node, colors) => {
@@ -320,9 +297,7 @@ const Components = {
     }
 };
 
-// ============================================
 // 7. NAVEGACIÓN
-// ============================================
 
 const Navigation = {
     goToProfile: (id) => {
@@ -330,9 +305,8 @@ const Navigation = {
     }
 };
 
-// ============================================
+
 // 8. BÚSQUEDA Y FILTROS
-// ============================================
 
 const Search = {
     perform: () => {
@@ -394,9 +368,7 @@ const Search = {
     }
 };
 
-// ============================================
 // 9. RENDERIZADO
-// ============================================
 
 const Render = {
     renderOrgView: (nodeId) => {
@@ -514,9 +486,7 @@ const Render = {
     }
 };
 
-// ============================================
 // 10. INICIALIZACIÓN
-// ============================================
 
 const DataManager = {
     buildStructure: (nodes) => {
@@ -562,9 +532,7 @@ const DataManager = {
     }
 };
 
-// ============================================
 // 11. EVENTO DE INICIO
-// ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
     // Inyectar filtro SVG
@@ -596,3 +564,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.raiz = State.root;
     window.renderOrgView = Render.renderOrgView;
 });
+
+
+
+

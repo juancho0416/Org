@@ -8,15 +8,9 @@ using System.Globalization;
 
 namespace Organigrama.Pages
 {
-    /// <summary>
-    /// Modelo de página para la gestión de agenda de actividades de empleados
-    /// Optimizado con mejor arquitectura, validaciones y manejo de errores
-    /// </summary>
     public class AgendaModel : PageModel
     {
-        // ============================================
-        // DEPENDENCIAS
-        // ============================================
+        ///Dependencias
         private readonly AppDbContext _context;
         private readonly ILogger<AgendaModel> _logger;
 
@@ -39,43 +33,30 @@ namespace Organigrama.Pages
             _logger = logger;
         }
 
-        // ============================================
-        // PROPIEDADES PÚBLICAS
-        // ============================================
+        ///Propiedades publicas
 
-        /// <summary>
-        /// ID del empleado actual
-        /// </summary>
+        ///Id del empleado actual
         public int EmpleadoId { get; set; }
 
-        /// <summary>
-        /// Nombre completo del empleado
-        /// </summary>
+        /// Nombre Completo del empleado
+
+
         public string NombreEmpleado { get; set; } = string.Empty;
 
-        /// <summary>
         /// Área del empleado (para colores)
-        /// </summary>
         public string AreaEmpleado { get; set; } = string.Empty;
 
-        /// <summary>
-        /// Lista de todas las actividades del empleado
-        /// </summary>
-        public List<Actividad> ListaActividades { get; set; } = new();
 
-        /// <summary>
+        /// Lista de todas las actividades del empleado
+        public List<Actividad> ListaActividades { get; set; } = new();
         /// Nueva actividad a registrar (binding desde formulario)
-        /// </summary>
+
         [BindProperty]
         public string? NuevaActividad { get; set; }
 
-        // ============================================
         // MÉTODOS DE UTILIDAD
-        // ============================================
 
-        /// <summary>
         /// Obtiene los colores del área del empleado
-        /// </summary>
         public (string Primary, string Secondary) GetAreaColors()
         {
             if (string.IsNullOrWhiteSpace(AreaEmpleado) || AreaEmpleado == "N/A")
@@ -94,13 +75,9 @@ namespace Organigrama.Pages
             return _areaColors[index];
         }
 
-        // ============================================
         // HANDLERS DE PÁGINA
-        // ============================================
 
-        /// <summary>
         /// Handler GET - Carga la agenda del empleado
-        /// </summary>
         public async Task<IActionResult> OnGetAsync(int id)
         {
             // Validación de parámetro
@@ -148,9 +125,7 @@ namespace Organigrama.Pages
             }
         }
 
-        /// <summary>
         /// Handler POST - Registra una nueva actividad
-        /// </summary>
         public async Task<IActionResult> OnPostAsync(int id)
         {
             // Validaciones
@@ -223,10 +198,7 @@ namespace Organigrama.Pages
 
             return RedirectToPage(new { id });
         }
-
-        /// <summary>
         /// Handler POST - Elimina una actividad
-        /// </summary>
         public async Task<IActionResult> OnPostEliminarAsync(int actividadId, int empleadoId)
         {
             // Validaciones
@@ -434,9 +406,9 @@ namespace Organigrama.Pages
                 currentRow++;
             }
 
-            // === FORMATO FINAL ===
+            // FORMATO FINAL
             // Ajustar columnas
-            worksheet.Column(1).Width = 8;  // #
+            worksheet.Column(1).Width = 20;  // #
             worksheet.Column(2).Width = 15; // Fecha
             worksheet.Column(3).Width = 10; // Hora
             worksheet.Column(4).Width = 60; // Descripción
@@ -461,10 +433,7 @@ namespace Organigrama.Pages
             workbook.SaveAs(stream);
             return stream.ToArray();
         }
-
-        /// <summary>
-        /// Sanitiza un nombre de archivo removiendo caracteres inválidos
-        /// </summary>
+        ///Sanitiza un nombre de archivo removiendo caracteres invalidos
         private string SanitizeFileName(string? fileName)
         {
             if (string.IsNullOrWhiteSpace(fileName))

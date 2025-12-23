@@ -47,9 +47,7 @@
             --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
-        /* ============================================
-           RESET Y BASE
-           ============================================ */
+        /*RESET Y BASE */
         * {
             margin: 0;
             padding: 0;
@@ -64,9 +62,7 @@
             min-height: 100vh;
         }
 
-        /* ============================================
-           CONTENEDOR PRINCIPAL
-           ============================================ */
+        /*CONTENEDOR PRINCIPAL*/
         .profile-wrapper {
             min-height: 100vh;
             padding: 40px 20px;
@@ -77,9 +73,7 @@
             margin: 0 auto;
         }
 
-        /* ============================================
-           BOTÓN REGRESAR (Consistente con organigrama)
-           ============================================ */
+        /*BOTÓN REGRESAR (Consistente con organigrama)*/
         .btn-back {
             display: inline-flex;
             align-items: center;
@@ -112,9 +106,7 @@
             transform: translateX(-4px);
         }
 
-        /* ============================================
-           TARJETA PRINCIPAL
-           ============================================ */
+        /*TARJETA PRINCIPAL*/
         .profile-card {
             background: white;
             border-radius: 32px;
@@ -236,9 +228,7 @@
             padding: 0 60px 60px;
         }
 
-        /* ============================================
-           AVATAR (Mejorado y consistente)
-           ============================================ */
+        /*AVATAR (Mejorado y consistente)*/
         .avatar-section {
             display: flex;
             justify-content: center;
@@ -306,9 +296,7 @@
             }
         }
 
-        /* ============================================
-           INFORMACIÓN PERSONAL
-           ============================================ */
+        /*INFORMACIÓN PERSONAL*/
         .info-section {
             text-align: center;
             margin-bottom: 40px;
@@ -377,9 +365,7 @@
             opacity: 0.7;
         }
 
-        /* ============================================
-           SECCIÓN DE DOCUMENTOS Y AGENDA
-           ============================================ */
+        /*SECCIÓN DE DOCUMENTOS Y AGENDA*/
         .documents-section {
             background: var(--color-background);
             border-radius: 24px;
@@ -517,9 +503,7 @@
             gap: 10px;
         }
 
-        /* ============================================
-           BOTONES DE ACCIÓN
-           ============================================ */
+        /*BOTONES DE ACCIÓN*/
         .btn-action {
             flex: 1;
             min-width: 140px;
@@ -599,9 +583,7 @@
             border-color: #e11d48;
         }
 
-        /* ============================================
-           MODAL DE VISUALIZACIÓN
-           ============================================ */
+        /*MODAL DE VISUALIZACIÓN*/
         .modal-overlay {
             display: none;
             position: fixed;
@@ -701,9 +683,7 @@
             border: none;
         }
 
-        /* ============================================
-           TOOLTIPS PERSONALIZADOS
-           ============================================ */
+        /*TOOLTIPS PERSONALIZADOS*/
         .tooltip-custom {
             position: absolute;
             background: rgba(15, 23, 42, 0.95);
@@ -755,9 +735,7 @@
             }
         }
 
-        /* ============================================
-           RESPONSIVE
-           ============================================ */
+        /*RESPONSIVE*/
         @@media (max-width: 992px) {
             .card-body {
                 padding: 0 30px 40px;
@@ -1087,18 +1065,18 @@
         @if (TempData["Success"] != null)
             {
                 <text>
-                                                                                                                                                                window.addEventListener('DOMContentLoaded', () => {
+                                                                                                                                                                                                                                                                                        window.addEventListener('DOMContentLoaded', () => {
                         mostrarNotificacion('@TempData["Success"]', 'success');
-                                                                                                                                                                });
+                                                                                                                                                                                                                                                                                        });
                 </text>
         }
 
             @if (TempData["Error"] != null)
             {
                 <text>
-                                                                                                                                                                window.addEventListener('DOMContentLoaded', () => {
+                                                                                                                                                                                                                                                                                        window.addEventListener('DOMContentLoaded', () => {
                         mostrarNotificacion('@TempData["Error"]', 'error');
-                                                                                                                                                                });
+                                                                                                                                                                                                                                                                                        });
                 </text>
         }
 
