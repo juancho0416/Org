@@ -12,12 +12,10 @@ namespace Organigrama.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // MAPEOS MANUALES (Crucial ya que no hay migraciones)
-            modelBuilder.Entity<Empleado>().ToTable("Empleado"); // Tu tabla se llama Empleado
-            modelBuilder.Entity<Actividad>().ToTable("Actividades"); // Tu tabla se llama Actividades
+            // MAPEOS MANUAL
+            modelBuilder.Entity<Empleado>().ToTable("Empleado");
+            modelBuilder.Entity<Actividad>().ToTable("Actividades");
 
-            // Si tus columnas en SQL se llaman igual que tus propiedades en C#, 
-            // no necesitas más configuración.
         }
     }
 }

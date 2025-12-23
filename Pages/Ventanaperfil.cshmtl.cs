@@ -15,19 +15,26 @@ namespace Organigrama.Pages
         public IFormFile? ArchivoCV { get; set; }
 
         private readonly (string Primary, string Secondary)[] _areaColors = new[]
-        {
-            ("#5A67D8", "#EEF0FA"), ("#d85a9bff", "#F1EEFA"),
-            ("#48bb78ff", "#EBF9F1"), ("#00b7ffff", "#E6F6EC"),
-            ("#F56565", "#FEEEEE"), ("#ED64A6", "#FDEFF6")
-        };
-
+    {
+    ("#00B5D8", "#EEF0FA"), // Área BD
+    ("#805AD5;", "#F1EEFA"), // Área Desarrollo
+    ("#48BB78", "#EBF9F1"), // Área Infra
+    (" #44337A", "#E6F6EC"), // Área Operaciones
+    ("#DD6B20", "#FEEEEE"), // Área T
+    ("#D53F8C", "#FDEFF6")  // Área DG
+};
         public (string Primary, string Secondary) GetAreaColors(string areaName)
         {
             if (string.IsNullOrEmpty(areaName) || areaName == "N/A") return _areaColors[0];
+
+            if (AreaPalette != null && AreaPalette.TryGetValue(areaName.Trim(), out var pal)) return pal;
+
             int hash = 0;
             foreach (char c in areaName.Trim().ToUpper()) hash += (int)c;
             return _areaColors[Math.Abs(hash) % _areaColors.Length];
         }
+
+        public Dictionary<string, (string Primary, string Secondary)> AreaPalette { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -37,6 +44,19 @@ namespace Organigrama.Pages
                 const string sql = "SELECT * FROM Empleado WHERE Id = @Id";
                 Empleado = await connection.QueryFirstOrDefaultAsync<Empleado>(sql, new { Id = id });
                 if (Empleado == null) return RedirectToPage("/Index");
+            }
+
+            using (var connection = new SqliteConnection(_connectionString))
+            {
+                const string areasSql = "SELECT DISTINCT Area FROM Empleado WHERE Area IS NOT NULL AND Area != ''";
+                var areas = (await connection.QueryAsync<string>(areasSql)).Where(a => !string.IsNullOrWhiteSpace(a)).Select(a => a.Trim()).Distinct().OrderBy(a => a).ToList();
+                int idx = 0;
+                foreach (var area in areas)
+                {
+                    var c = _areaColors[idx % _areaColors.Length];
+                    AreaPalette[area] = c;
+                    idx++;
+                }
             }
             return Page();
         }

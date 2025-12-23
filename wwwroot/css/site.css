@@ -6,7 +6,41 @@
     --color-text-light: #718096; 
     --color-border: #E2E8F0; 
     --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+    /* 0 - Azul Real */
+    --area-color-0-primary: #5A67D8;
+    --area-color-0-secondary: #EEF0FA;
+
+    --area-color-1-primary: #805AD5;
+    --area-color-1-secondary: #FAF5FF;
+
+    --area-color-2-primary: #38A169;
+    --area-color-2-secondary: #F0FFF4;
+
+    --area-color-3-primary: #00B5D8;
+    --area-color-3-secondary: #E6FFFA;
+
+    --area-color-4-primary: #DD6B20;
+    --area-color-4-secondary: #FFFAF0;
+
+    --area-color-5-primary: #D53F8C;
+    --area-color-5-secondary: #FFF5F7;
+
+    --area-color-8-primary: #44337A;
+    --area-color-8-secondary: #F3F0FF;
+
+    --area-color-9-primary: #9C4221;
+    --area-color-9-secondary: #FFFAF0;
 }
+
+/* Accesibilidad: indicadores de foco visibles y consistentes */
+button:focus, .btn-view:focus, .btn-search:focus, a:focus, .form-control:focus, .form-select:focus {
+    outline: 3px solid rgba(90,103,216,0.18);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(90,103,216,0.06);
+}
+
+/* Mejora para elementos interactivos con alto contraste de texto */
 
 body { background-color: var(--color-background); font-family: var(--font-family); margin: 0; color: var(--color-text-dark); }
 .org-container { max-width: 1300px; margin: 40px auto; padding: 0 30px; }
@@ -29,10 +63,25 @@ body { background-color: var(--color-background); font-family: var(--font-family
 .chief-card-content { display: flex; align-items: center; gap: 20px; cursor: pointer; }
 .leader-badge { position: absolute; top: -12px; right: 20px; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
 .btn-up-modern { 
-    background: #fff; border: 1px solid var(--color-border); padding: 6px 15px; 
-    border-radius: 20px; font-size: 0.8rem; margin-bottom: 15px; cursor: pointer; transition: 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: white;
+        color:#5A67D8;
+        padding: 10px 22px;
+        border-radius: 12px;
+        font-weight: 700;
+        text-decoration: none !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+        margin-bottom: 25px;
+        transition: all 0.3s ease;
 }
-.btn-up-modern:hover { background: var(--color-text-dark); color: white; }
+.btn-up-modern:hover {   
+        transform: translateX(-5px);
+        background: #5A67D8;
+        color: white;
+        box-shadow: 0 6px 15px rgba(90, 103, 216, 0.3); }
 
 /* 4. BURBUJAS DE ÁREA  */
 .areas-container-modern { display: flex; flex-direction: column; gap: 15px; }
@@ -711,14 +760,17 @@ Reutilizando tu estilo de .chief-card-premium para el CV
 .ripple {
     position: absolute;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
-    transform: scale(0);
-    animation: ripple-animation 0.6s linear;
+    background: rgba(255, 255, 255, 0.45);
+    transform: scale(0.2);
+    will-change: transform, opacity;
+    animation: ripple-animation 520ms cubic-bezier(0.2, 0.8, 0.2, 1);
     pointer-events: none;
 }
 
 @keyframes ripple-animation {
-    to { transform: scale(4); opacity: 0; }
+    0% { transform: scale(0.2); opacity: 0.9; }
+    60% { transform: scale(2.6); opacity: 0.6; }
+    100% { transform: scale(3.6); opacity: 0; }
 }
 
 /* 4. Animación de entrada en Cascada */
@@ -750,14 +802,12 @@ Reutilizando tu estilo de .chief-card-premium para el CV
 }
 
 /* 3. Efecto de Levitar (Para los subordinados) */
+/* Sustituimos la animación infinita por una transición suave al hover
+   (mejor rendimiento y menos movimientos constantes) */
 .subordinate-module-modern:hover {
-    animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-    0% { transform: translateY(0px) rotateX(0deg); }
-    50% { transform: translateY(-5px) rotateX(2deg); }
-    100% { transform: translateY(0px) rotateX(0deg); }
+    transform: translateY(-4px) rotateX(1deg);
+    transition: transform 420ms cubic-bezier(0.2, 0.9, 0.2, 1), box-shadow 420ms ease;
+    box-shadow: 0 10px 18px rgba(0,0,0,0.08);
 }
 
 /* 4. Glassmorphism Focus (Desenfoque de fondo al enfocar búsqueda) */
@@ -877,6 +927,32 @@ Reutilizando tu estilo de .chief-card-premium para el CV
         margin-bottom: 12px;
     }
 
+/* Entrada animada para items del timeline */
+.timeline-item-modern {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: transform 420ms cubic-bezier(0.2, 0.9, 0.2, 1), opacity 420ms ease;
+    will-change: transform, opacity;
+}
+.timeline-item-modern.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Expansión accesible (teclado/enter) */
+.timeline-item-modern:focus {
+    outline: 3px solid rgba(90,103,216,0.14);
+    outline-offset: 6px;
+}
+.timeline-item-modern.expanded .item-card {
+    transform: translateX(0);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+/* Hacer que la hora y tarjeta sean más legibles en movimiento */
+.item-hour { transition: color 220ms ease, transform 220ms ease; }
+.timeline-item-modern.visible .item-hour { transform: translateX(0); }
+
     /* Hora a la izquierda de la línea */
     .item-hour {
         position: absolute;
@@ -940,3 +1016,226 @@ Reutilizando tu estilo de .chief-card-premium para el CV
     }
    
 
+
+
+
+
+
+
+
+
+    /* El contenedor "Cápsula" */
+.view-switch.liquid-container {
+    position: relative;
+    display: inline-flex;
+    background: #e2e8f0;
+    padding: 6px;
+    border-radius: 20px;
+    filter: url("#liquid-fusion"); /* Referencia al filtro inyectado por JS */
+    min-width: 200px;
+    border: 1px solid rgba(255,255,255,0.5);
+}
+
+/* Los botones */
+.btn-view {
+    position: relative;
+    flex: 1;
+    z-index: 2;
+    border: none;
+    background: transparent;
+    padding: 10px 24px;
+    font-weight: 700;
+    color: #475569;
+    cursor: pointer;
+    transition: color 0.4s ease, transform 0.2s ease;
+}
+
+.btn-view.active {
+    color: white;
+}
+
+/* La gota de cristal líquido (Blob) */
+.view-switch-blob {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    height: calc(100% - 12px);
+    width: calc(50% - 6px); /* Dividido entre 2 botones */
+    background: var(--area-primary);
+    border-radius: 15px;
+    z-index: 1;
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Lógica de posición de la gota */
+/* Si el segundo elemento (.btn-view activo) es el seleccionado */
+.view-switch:has(.btn-view.active:nth-child(2)) .view-switch-blob {
+    transform: translateX(0);
+}
+
+/* Si el tercer elemento (.btn-view activo) es el seleccionado */
+.view-switch:has(.btn-view.active:nth-child(3)) .view-switch-blob {
+    transform: translateX(100%);
+}
+
+/* Efecto Magnético: el botón se estira ligeramente al pasar el mouse */
+.btn-view:hover {
+    transform: scale(1.1);
+}
+
+/* Animación de "rebote líquido" al hacer click */
+.view-switch:active .view-switch-blob {
+    transform: scaleX(1.2) scaleY(0.85);
+}
+
+
+
+
+/* Contenedor de área con física líquida */
+.area-bubble-wrapper.liquid-area {
+    position: relative;
+    filter: url("#liquid-fusion"); /* Reutilizamos el filtro de los botones */
+    margin-bottom: 20px;
+    transition: all 0.5s ease;
+}
+
+/* La gota de fondo que se estira */
+.expansion-blob {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 30px;
+    z-index: -1;
+    transform: scaleY(0.1);
+    transform-origin: top;
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    opacity: 0;
+}
+
+.area-bubble-wrapper.is-open .expansion-blob {
+    transform: scaleY(1);
+    opacity: 1;
+}
+
+/* El cuerpo colapsable */
+.area-collapsible-body {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+    transition: 
+        max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.4s ease,
+        transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    padding: 0 20px;
+}
+
+.area-bubble-wrapper.is-open .area-collapsible-body {
+    max-height: 2000px; /* Ajusta según tu contenido */
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    padding: 20px;
+}
+
+/* Ajuste del Header para que parezca una tapa de burbuja */
+.area-bubble-header {
+    position: relative;
+    z-index: 10;
+    border-radius: 20px;
+    transition: transform 0.2s ease, border-radius 0.4s ease;
+    cursor: pointer;
+    user-select: none;
+}
+
+.area-bubble-wrapper.is-open .area-bubble-header {
+    border-radius: 20px 20px 0 0;
+}
+
+/* Animación del icono de flecha */
+.toggle-icon {
+    transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.area-bubble-wrapper.is-open .toggle-icon {
+    transform: rotate(180deg);
+}
+
+
+
+
+/* Partícula individual */
+.liquid-particle {
+    position: fixed;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    filter: url("#liquid-fusion"); /* Crucial para que parezcan gotas */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Efecto visual de la burbuja cerrada/abierta */
+.area-bubble-wrapper.liquid-area {
+    will-change: filter;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Estilo de la "gota" de expansión de fondo */
+.expansion-blob {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px; /* Tamaño inicial coincidente con el header */
+    border-radius: 20px;
+    z-index: -1;
+    opacity: 0.8;
+    transform-origin: top;
+    transition: 
+        transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+        height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.area-bubble-wrapper.is-open .expansion-blob {
+    height: 100%; /* Se estira para cubrir todo el cuerpo */
+    transform: scale(1.02); /* Efecto de inflado ligero */
+}
+
+
+
+
+/* Contenedor de la foto con máscara líquida */
+.avatar-wrapper img, .node-photo {
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s ease;
+    border-radius: 40% 60% 60% 40% / 60% 30% 70% 40%; /* Forma orgánica inicial */
+    animation: liquid-morph 8s ease-in-out infinite;
+    border: 4px solid rgba(255, 255, 255, 0.8);
+    object-fit: cover;
+    background: white;
+}
+
+/* Animación de deformación constante (como un fluido) */
+@keyframes liquid-morph {
+    0% { border-radius: 40% 60% 60% 40% / 60% 30% 70% 40%; }
+    50% { border-radius: 50% 50% 30% 70% / 50% 60% 40% 60%; }
+    100% { border-radius: 40% 60% 60% 40% / 60% 30% 70% 40%; }
+}
+
+/* Efecto de brillo de cristal sobre la imagen */
+.avatar-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    width: 30%;
+    height: 30%;
+    background: rgba(255, 255, 255, 0.4);
+    filter: blur(5px);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10;
+}

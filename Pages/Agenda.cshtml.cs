@@ -25,7 +25,7 @@ namespace Organigrama.Pages
         public async Task<IActionResult> OnGetAsync(int id)
         {
             EmpleadoId = id;
-            // 2. Intentar obtener el empleado
+            //obtener el empleado
             var emp = await _context.Empleados.FirstOrDefaultAsync(e => e.Id == id);
 
             NombreEmpleado = emp.Nombre;
@@ -55,7 +55,7 @@ namespace Organigrama.Pages
         }
         public async Task<IActionResult> OnPostEliminarAsync(int actividadId, int empleadoId)
         {
-            // Buscamos la actividad directamente por su Id
+            // Buscar la actividad directamente por su Id
             var actividad = await _context.Actividades.FindAsync(actividadId);
 
             if (actividad != null)
@@ -64,7 +64,7 @@ namespace Organigrama.Pages
                 await _context.SaveChangesAsync();
             }
 
-            // Redirigimos de vuelta a la agenda del empleado
+            // Redirigir de vuelta a la agenda del empleado
             return RedirectToPage(new { id = empleadoId });
         }
 

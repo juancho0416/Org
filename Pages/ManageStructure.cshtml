@@ -1,0 +1,297 @@
+@page
+@model Organigrama.Pages.ManageStructureModel
+@{
+    ViewData["Title"] = "Editar Estructura del Organigrama";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/site.css" />
+}
+
+<a href="/Index" class="btn-regresar-custom">
+    <i class="fas fa-arrow-left"></i>Regresar a inicio</a>
+<div class="app-container">
+    <main>
+        <div class="org-container container py-4">
+            <header class="page-header mb-3">
+                <h1>Editar Estructura del Organigrama</h1>
+                <p class="lead-text">Agrega, elimina y reasigna jefes desde esta interfaz.</p>
+            </header>
+
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-success">@TempData["Message"]</div>
+            }
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Agregar nuevo empleado</h5>
+                    <form method="post" asp-page-handler="Add" class="row g-2">
+                        <div class="col-md-3">
+                            <input asp-for="NewEmpleado.Nombre" class="form-control" placeholder="Nombre" />
+                        </div>
+                        <div class="col-md-3">
+                            <input asp-for="NewEmpleado.Puesto" class="form-control" placeholder="Puesto" />
+                        </div>
+                        <div class="col-md-2">
+                            <input asp-for="NewEmpleado.Area" class="form-control" placeholder="Area" />
+                        </div>
+                        <div class="col-md-2">
+                            <input asp-for="NewEmpleado.Email" class="form-control" placeholder="Email" />
+                        </div>
+                        <div class="col-md-2">
+                            <select asp-for="NewEmpleado.JefeId" class="form-select">
+                                <option value="">(Sin Jefe)</option>
+                                @foreach (var m in Model.Empleados)
+                                {
+                                    <option value="@m.Id">(@m.Id) @m.Nombre</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-12 mt-2">
+                            <button type="submit" class="btn btn-success">Agregar empleado</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <form method="post">
+                <div class="card">
+                    <div class="card-body">
+                        <div id="drop-root" class="drop-root mb-3">Arrastra aquí para dejar sin jefe (Soltar para quitar
+                            jefe)</div>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Nombre</th>
+                                    <th>Puesto</th>
+                                    <th>Jefe Actual</th>
+                                    <th>Asignar Jefe</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var emp in Model.Empleados)
+                                {
+                                    <tr class="draggable-row" draggable="true" data-emp-id="@emp.Id" aria-grabbed="false">
+                                        <td>@emp.Id</td>
+                                        <td>@emp.Nombre</td>
+                                        <td>@emp.Puesto</td>
+                                        <td>@(emp.JefeId.HasValue? emp.JefeId.ToString() : "(Sin Jefe)")</td>
+                                        <td>
+                                            <select name="manager_@emp.Id" class="form-select">
+                                                <option value="">(Sin Jefe)</option>
+                                                @foreach (var m in Model.Empleados)
+                                                {
+                                                    if (m.Id == emp.Id) { continue; }
+                                                    <option value="@m.Id" selected="@(m.Id == emp.JefeId ? "selected" : null)">
+                                                        (@m.Id) @m.Nombre - @m.Puesto</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <form method="post" asp-page-handler="Delete" asp-route-id="@emp.Id"
+                                                onsubmit="return confirm('¿Borrar empleado y dejar subordinados sin jefe?')">
+                                                <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </form>
+
+            <p class="text-muted small mt-3">Nota: la página previene asignaciones que creen ciclos (no puedes asignarte
+                como jefe a un subordinado).</p>
+        </div>
+    </main>
+</div>
+<style>
+    :root {
+        --area-primary: #5A67D8;
+        --area-secondary: #EEF0FA;
+    }
+
+    .btn-regresar-custom {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: white;
+        color: var(--area-primary);
+        padding: 10px 22px;
+        border-radius: 12px;
+        font-weight: 700px;
+        text-decoration: none !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+        margin-bottom: 25px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-regresar-custom:hover {
+        transform: translateX(-5px);
+        background: var(--area-primary);
+        color: white;
+        box-shadow: 0 6px 15px rgba(90, 103, 216, 0.3);
+    }
+</style>
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('select[name^="manager_"]').forEach(function (sel) {
+                sel.setAttribute('data-prev', sel.value || '');
+                sel.addEventListener('change', async function () {
+                    const name = this.name;
+                    const empId = parseInt(name.replace('manager_', ''));
+                    const val = this.value;
+                    const mgrId = val ? parseInt(val) : null;
+                    this.disabled = true;
+                    try {
+                        const res = await fetch('/api/manage/update-manager', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ employeeId: empId, managerId: mgrId })
+                        });
+                        const data = await res.json();
+                        if (res.ok && data && data.success) {
+                            showToast(data.message || 'Guardado');
+                            this.setAttribute('data-prev', this.value || '');
+                        } else {
+                            alert(data?.message || 'Error al actualizar');
+                            this.value = this.getAttribute('data-prev') || '';
+                        }
+                    } catch (err) {
+                        alert('Error de red');
+                        this.value = this.getAttribute('data-prev') || '';
+                    }
+                    this.disabled = false;
+                });
+            });
+
+            function showToast(msg) {
+                const el = document.createElement('div');
+                el.className = 'toast-msg';
+                el.innerText = msg;
+                Object.assign(el.style, { position: 'fixed', right: '20px', bottom: '20px', padding: '10px 14px', background: '#222', color: '#fff', borderRadius: '8px', zIndex: 99999 });
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 2200);
+            }
+        });
+    </script>
+    <style>
+        .draggable-row.dragging {
+            opacity: 0.5;
+        }
+
+        .draggable-row.drag-over {
+            outline: 3px dashed rgba(90, 103, 216, 0.6);
+        }
+
+        .drop-root {
+            border: 2px dashed #d1d5db;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            color: #374151;
+            background: #fafafa;
+        }
+
+        .drop-root.drag-over {
+            border-color: #5A67D8;
+            background: #f1f5ff;
+            color: #1e293b;
+        }
+    </style>
+    <script>
+        // Drag & Drop para reasignar jefes arrastrando filas
+        document.addEventListener('DOMContentLoaded', function () {
+            function _toast(msg) {
+                if (typeof showToast === 'function') { showToast(msg); return; }
+                const el = document.createElement('div');
+                el.className = 'toast-msg';
+                el.innerText = msg;
+                Object.assign(el.style, { position: 'fixed', right: '20px', bottom: '20px', padding: '10px 14px', background: '#222', color: '#fff', borderRadius: '8px', zIndex: 99999 });
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 2200);
+            }
+
+            const rows = document.querySelectorAll('tr.draggable-row');
+            rows.forEach(row => {
+                row.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', row.dataset.empId);
+                    row.classList.add('dragging');
+                    row.setAttribute('aria-grabbed', 'true');
+                });
+                row.addEventListener('dragend', () => { row.classList.remove('dragging'); row.setAttribute('aria-grabbed', 'false'); });
+
+                row.addEventListener('dragover', (e) => { e.preventDefault(); row.classList.add('drag-over'); });
+                row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+
+                row.addEventListener('drop', async (e) => {
+                    e.preventDefault(); row.classList.remove('drag-over');
+                    const draggedId = parseInt(e.dataTransfer.getData('text/plain'));
+                    const targetId = parseInt(row.dataset.empId);
+                    if (!draggedId || !targetId || draggedId === targetId) return;
+                    if (!confirm(`¿Asignar empleado ${draggedId} bajo el jefe ${targetId}?`)) return;
+                    try {
+                        const res = await fetch('/api/manage/update-manager', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ employeeId: draggedId, managerId: targetId })
+                        });
+                        const data = await res.json();
+                        if (res.ok && data && data.success) {
+                            _toast(data.message || 'Asignación guardada');
+                            const sel = document.querySelector(`select[name="manager_${draggedId}"]`);
+                            if (sel) { sel.value = targetId; sel.setAttribute('data-prev', sel.value || ''); }
+                            // actualizar columna "Jefe Actual"
+                            const draggedRow = document.querySelector(`tr[data-emp-id="${draggedId}"]`);
+                            if (draggedRow) {
+                                const jefeCell = draggedRow.children[3];
+                                if (jefeCell) jefeCell.textContent = targetId.toString();
+                                draggedRow.setAttribute('aria-grabbed', 'false');
+                            }
+                        } else {
+                            alert(data?.message || 'Error al actualizar');
+                        }
+                    } catch (err) { alert('Error de red'); }
+                });
+            });
+
+            const dropRoot = document.getElementById('drop-root');
+            if (dropRoot) {
+                dropRoot.addEventListener('dragover', (e) => { e.preventDefault(); dropRoot.classList.add('drag-over'); });
+                dropRoot.addEventListener('dragleave', () => dropRoot.classList.remove('drag-over'));
+                dropRoot.addEventListener('drop', async (e) => {
+                    e.preventDefault(); dropRoot.classList.remove('drag-over');
+                    const draggedId = parseInt(e.dataTransfer.getData('text/plain'));
+                    if (!draggedId) return;
+                    if (!confirm(`¿Quitar jefe del empleado ${draggedId} (dejar sin jefe)?`)) return;
+                    try {
+                        const res = await fetch('/api/manage/update-manager', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ employeeId: draggedId, managerId: null })
+                        });
+                        const data = await res.json();
+                        if (res.ok && data && data.success) {
+                            _toast(data.message || 'Empleado sin jefe');
+                            const sel = document.querySelector(`select[name="manager_${draggedId}"]`);
+                            if (sel) { sel.value = ''; sel.setAttribute('data-prev', ''); }
+                            const draggedRow = document.querySelector(`tr[data-emp-id="${draggedId}"]`);
+                            if (draggedRow) {
+                                const jefeCell = draggedRow.children[3];
+                                if (jefeCell) jefeCell.textContent = '(Sin Jefe)';
+                                draggedRow.setAttribute('aria-grabbed', 'false');
+                            }
+                        } else {
+                            alert(data?.message || 'Error al actualizar');
+                        }
+                    } catch (err) { alert('Error de red'); }
+                });
+            }
+        });
+    </script>
+}

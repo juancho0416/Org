@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\jmartinezg\\OneDrive - Comisión Nacional de Energía\\Escritorio\\Nueva carpeta\\Organigrama\\Organigrama.csproj": {}
+    "C:\\Users\\jmartinezg\\OneDrive - Comisión Nacional de Energía\\Escritorio\\Nueva carpeta\\Org\\Organigrama.csproj": {}
   },
   "projects": {
-    "C:\\Users\\jmartinezg\\OneDrive - Comisión Nacional de Energía\\Escritorio\\Nueva carpeta\\Organigrama\\Organigrama.csproj": {
+    "C:\\Users\\jmartinezg\\OneDrive - Comisión Nacional de Energía\\Escritorio\\Nueva carpeta\\Org\\Organigrama.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\jmartinezg\\OneDrive - Comisión Nacional de Energía\\Escritorio\\Nueva carpeta\\Organigrama\\Organigrama.csproj",
+        "projectUniqueName": "C:\\Users\\jmartinezg\\OneDrive - Comisión Nacional de Energía\\Escritorio\\Nueva carpeta\\Org\\Organigrama.csproj",
         "projectName": "Organigrama",
-        "projectPath": "C:\\Users\\jmartinezg\\OneDrive - Comisión Nacional de Energía\\Escritorio\\Nueva carpeta\\Organigrama\\Organigrama.csproj",
+        "projectPath": "C:\\Users\\jmartinezg\\OneDrive - Comisión Nacional de Energía\\Escritorio\\Nueva carpeta\\Org\\Organigrama.csproj",
         "packagesPath": "C:\\Users\\jmartinezg\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\jmartinezg\\OneDrive - Comisión Nacional de Energía\\Escritorio\\Nueva carpeta\\Organigrama\\obj\\",
+        "outputPath": "C:\\Users\\jmartinezg\\OneDrive - Comisión Nacional de Energía\\Escritorio\\Nueva carpeta\\Org\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

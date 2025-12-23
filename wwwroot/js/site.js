@@ -1,18 +1,44 @@
-﻿
+﻿// Inyectar el motor de físicas líquidas al DOM
+if (!document.getElementById('liquid-filter-svg')) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.id = "liquid-filter-svg";
+    svg.style.display = "none";
+    svg.innerHTML = `
+        <defs>
+            <filter id="liquid-fusion">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 25 -10" result="liquid" />
+                <feComposite in="SourceGraphic" in2="liquid" operator="atop"/>
+            </filter>
+        </defs>`;
+    document.body.appendChild(svg);
+}
 const CONFIG = {
     CHIEF_ID_FIELD: 'jefeId', 
     API_URL: '/api/empleado/todos', 
 };
-
-const AREA_COLORS = [
-    { primary: '#5A67D8', secondary: '#EEF0FA' }, 
-    { primary: '#d85a9bff', secondary: '#F1EEFA' }, 
-    { primary: '#48bb78ff', secondary: '#EBF9F1' }, 
-    { primary: '#00b7ffff', secondary: '#E6F6EC' }, 
-    { primary: '#F56565', secondary: '#FEEEEE' }, 
-    { primary: '#ED64A6', secondary: '#FDEFF6' }, 
-   
-];
+const AREA_COLORS = (function () {
+    const arr = [];
+    const css = getComputedStyle(document.documentElement);
+    
+    // Buscamos hasta 12 colores posibles en el CSS
+   // En tu site.js, dentro de la función AREA_COLORS:
+for (let i = 0; i < 10; i++) { // Cambiado de 6 a 10
+    const p = css.getPropertyValue(`--area-color-${i}-primary`).trim();
+    const s = css.getPropertyValue(`--area-color-${i}-secondary`).trim();
+    if (p) arr.push({ primary: p, secondary: s || '#EEF0FA' });
+}
+    
+    // Si no hay colores en CSS, paleta de emergencia variada
+    return arr.length ? arr : [
+        { primary: '#5A67D8', secondary: '#EEF0FA' }, // Azul
+        { primary: '#38A169', secondary: '#F0FFF4' }, // Verde
+        { primary: '#E53E3E', secondary: '#FFF5F5' }, // Rojo
+        { primary: '#DD6B20', secondary: '#FFFAF0' }, // Naranja
+        { primary: '#805AD5', secondary: '#FAF5FF' }, // Morado
+        { primary: '#3182CE', secondary: '#EBF8FF' }  // Celeste
+    ];
+})();
 
 let areaColorMap = new Map();
 let colorIndex = 0;
@@ -26,16 +52,38 @@ let currentViewMode = 'grid';
 let rootElModular, listContainer, chiefContainer; 
 
 // --- Helpers de UI ---
-function getAreaColors(areaName) {
-    if (!areaColorMap.has(areaName)) {
-        const color = AREA_COLORS[colorIndex % AREA_COLORS.length];
-        areaColorMap.set(areaName, color);
-        colorIndex++;
-        return color;
-    }
-    return areaColorMap.get(areaName);
-}
+// Variable global para recordar qué color le dimos a cada área
+const assignedColors = new Map();
 
+function getAreaColors(areaName) {
+    const name = areaName?.toString().trim().toUpperCase() || 'DEFAULT';
+    
+    // 1. Si ya le asignamos un color en esta sesión, devolverlo
+    if (assignedColors.has(name)) return assignedColors.get(name);
+
+    // 2. Intentar leer de la paleta window (si existe)
+    try {
+        if (window.AREA_PALETTE && window.AREA_PALETTE[name]) {
+            return window.AREA_PALETTE[name];
+        }
+    } catch (e) {}
+
+    // 3. Lógica de asignación mejorada
+    // Usamos un hash un poco más complejo para evitar colisiones simples
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+        hash = ((hash << 5) - hash) + name.charCodeAt(i);
+        hash |= 0; // Convertir a 32bit integer
+    }
+    
+    // Usamos el índice basado en la cantidad de colores disponibles
+    const idx = Math.abs(hash) % AREA_COLORS.length;
+    const color = AREA_COLORS[idx];
+    
+    // Guardar para que no cambie y retornar
+    assignedColors.set(name, color);
+    return color;
+}
 function getNodeValue(node, prop, defaultText = 'N/A') {
     const value = node?.[prop];
     return (value !== null && value !== undefined && value.toString().trim() !== '') 
@@ -64,7 +112,7 @@ function createProfilePicture(node, colors) {
     if (imageUrl && imageUrl !== 'N/A') {
         const img = el('img', 'profile-pic');
         img.src = imageUrl;
-        img.loading = "lazy"; // Mejora de rendimiento
+        img.loading = "lazy";
         img.onerror = function() {
             this.remove(); 
             imageContainer.classList.add('has-initials');
@@ -176,21 +224,74 @@ function renderNodeTree(node, colors) {
         li.appendChild(ul);
     }
     return li;
+}/**
+ * 1. INYECTOR DE FÍSICAS LÍQUIDAS
+ * Ejecuta esto una vez al cargar tu aplicación o antes de renderizar.
+ */
+if (!document.getElementById('liquid-filter-svg')) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.id = "liquid-filter-svg";
+    svg.setAttribute("style", "position:absolute; width:0; height:0; pointer-events:none;");
+    svg.innerHTML = `
+        <defs>
+            <filter id="liquid-fusion">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -10" result="liquid" />
+                <feComposite in="SourceGraphic" in2="liquid" operator="atop"/>
+            </filter>
+        </defs>`;
+    document.body.appendChild(svg);
 }
+
+/**
+ * 2. FUNCIÓN DE RENDERIZADO CON EFECTO LIQUID GLASS
+ */
 function renderSubordinateContent(chiefNode) { 
     listContainer.innerHTML = '';
+    
+    // Contenedores principales
     const controls = el('div', 'subordinate-controls');
-    const viewSwitch = el('div', 'view-switch');
+    const viewSwitch = el('div', 'view-switch liquid-container'); 
+    
+    // La gota (blob) que se mueve entre botones
+    const liquidBlob = el('div', 'view-switch-blob');
+    
+    // Botones con lógica de vista
     const btnGrid = el('button', `btn-view ${currentViewMode === 'grid' ? 'active' : ''}`, 'Lista');
     const btnDiag = el('button', `btn-view ${currentViewMode === 'diagram' ? 'active' : ''}`, 'Diagrama');
 
-    btnGrid.onclick = () => { currentViewMode = 'grid'; window.renderOrgView(chiefNode.id); };
-    btnDiag.onclick = () => { currentViewMode = 'diagram'; window.renderOrgView(chiefNode.id); };
+    // Lógica de magnetismo para los botones
+    [btnGrid, btnDiag].forEach(btn => {
+        btn.addEventListener('mousemove', (e) => {
+            const rect = btn.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            // El botón sigue al cursor ligeramente (30% de fuerza)
+            btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+        });
+        
+        btn.addEventListener('mouseleave', () => {
+            btn.style.transform = `translate(0, 0)`;
+        });
+    });
+
+    btnGrid.onclick = () => { 
+        currentViewMode = 'grid'; 
+        window.renderOrgView(chiefNode.id); 
+    };
     
-    viewSwitch.append(btnGrid, btnDiag);
+    btnDiag.onclick = () => { 
+        currentViewMode = 'diagram'; 
+        window.renderOrgView(chiefNode.id); 
+    };
+    
+    // Construcción del Switch: El blob va primero para quedar al fondo
+    viewSwitch.append(liquidBlob, btnGrid, btnDiag);
+    
     controls.append(el('h4', null, 'Estructura de Equipo'), viewSwitch);
     listContainer.appendChild(controls);
 
+    // Lógica de contenido (Grid vs Diagrama)
     if (currentViewMode === 'diagram') {
         const treeCont = el('div', 'org-tree-container');
         const chart = el('ul', 'org-chart');
@@ -200,7 +301,6 @@ function renderSubordinateContent(chiefNode) {
     } else {
         const areasContainer = el('div', 'areas-container-modern');
         
-        // Agrupamos inicialmente por área para crear las burbujas
         const grupos = chiefNode.hijos.reduce((acc, emp) => {
             const a = getNodeValue(emp, 'area');
             if (!acc[a]) acc[a] = []; 
@@ -210,9 +310,10 @@ function renderSubordinateContent(chiefNode) {
 
         Object.keys(grupos).sort().forEach(area => {
             const colors = getAreaColors(area);
-            const areaWrapper = el('div', 'area-bubble-wrapper');
-            
-            // --- ENCABEZADO DE LA BURBUJA ---
+            const areaWrapper = el('div', 'area-bubble-wrapper liquid-area'); // Añadimos la clase liquid-area
+            // Creamos un elemento "gota de expansión" para el fondo
+const expansionBlob = el('div', 'expansion-blob');
+expansionBlob.style.backgroundColor = colors.secondary;
             const areaHeader = el('div', 'area-bubble-header');
             areaHeader.style.borderLeft = `6px solid ${colors.primary}`;
             areaHeader.style.backgroundColor = colors.secondary;
@@ -233,8 +334,6 @@ function renderSubordinateContent(chiefNode) {
             const collapsibleBody = el('div', 'area-collapsible-body');
             const hierarchyContainer = el('div', 'internal-hierarchy-flow');
 
-            //LÓGICA DE JERARQUÍA INTERNA 
-            // Renderizar solo los nodos raíz de esta área dentro de la burbuja
             grupos[area].forEach(empleado => {
                 hierarchyContainer.appendChild(renderHierarchicalNode(empleado, colors));
             });
@@ -246,9 +345,10 @@ function renderSubordinateContent(chiefNode) {
             areasContainer.appendChild(areaWrapper);
         });
         listContainer.appendChild(areasContainer);
+        // Insertamos la gota de expansión al inicio del wrapper
+areaWrapper.append(expansionBlob, areaHeader, collapsibleBody);
     }
 }
-
 /**
  * Función recursiva para crear la cascada jerárquica dentro de la burbuja
  */
@@ -424,38 +524,55 @@ function hideTooltip() {
 /* --- COMBO DINÁMICO: INTERACCIONES --- */
 
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // A. EFECTO TILT 3D Y BRILLO
-    const tiltElements = document.querySelectorAll('.chief-card-premium, .subordinate-module-modern');
+    const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    tiltElements.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            // Cálculos para rotación
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            const rotateX = (centerY - y) / 15; // Sensibilidad X
-            const rotateY = (x - centerX) / 15; // Sensibilidad Y
+    // A. EFECTO TILT 3D Y BRILLO (optimizado con requestAnimationFrame)
+    if (!prefersReduced) {
+        const tiltElements = document.querySelectorAll('.chief-card-premium, .subordinate-module-modern');
 
-            // Aplicar transformación y variables para el brillo CSS
-            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-            card.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
-            card.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
+        tiltElements.forEach(card => {
+            let lastEvent = null;
+            let ticking = false;
+
+            function applyTilt() {
+                if (!lastEvent) { ticking = false; return; }
+                const e = lastEvent;
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = (centerY - y) / 18; // sensibilidad ajustada
+                const rotateY = (x - centerX) / 18;
+
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                card.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
+                card.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
+                ticking = false;
+            }
+
+            card.addEventListener('mousemove', (ev) => {
+                lastEvent = ev;
+                if (!ticking) {
+                    ticking = true;
+                    requestAnimationFrame(applyTilt);
+                }
+            }, { passive: true });
+
+            card.addEventListener('mouseleave', () => {
+                // Suaviza la vuelta a posición neutra
+                card.style.transition = 'transform 420ms cubic-bezier(0.2,0.9,0.2,1)';
+                card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+                // quitar la transición inline pasado el tiempo
+                setTimeout(() => { card.style.transition = ''; }, 450);
+            });
         });
+    }
 
-        card.addEventListener('mouseleave', () => {
-            card.style.transition = 'transform 0.5s ease';
-            card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-        });
-    });
-
-    // B. EFECTO RIPPLE (ONDA AL CLIC)
+    // B. EFECTO RIPPLE (ONDA AL CLIC) - limpiar con animationend para precisión
     document.addEventListener('click', function (e) {
         const target = e.target.closest('.btn-search, .area-bubble-header, .btn-up-modern');
-        if (target) {
+        if (target && !prefersReduced) {
             const ripple = document.createElement('span');
             const rect = target.getBoundingClientRect();
             const size = Math.max(rect.width, rect.height);
@@ -468,7 +585,10 @@ document.addEventListener('DOMContentLoaded', () => {
             ripple.classList.add('ripple');
 
             target.appendChild(ripple);
-            setTimeout(() => ripple.remove(), 600);
+            // Remove when animation finishes; fallback timeout
+            const cleanup = () => { if (ripple && ripple.parentNode) ripple.parentNode.removeChild(ripple); };
+            ripple.addEventListener('animationend', cleanup, { once: true });
+            setTimeout(cleanup, 700);
         }
     });
 
@@ -476,7 +596,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const animateCascade = () => {
         const items = document.querySelectorAll('.area-bubble-wrapper');
         items.forEach((item, index) => {
-            item.style.animationDelay = `${index * 0.1}s`;
+            item.style.animationDelay = `${index * 0.08}s`;
         });
     };
     animateCascade();
@@ -490,19 +610,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* --- MICRO-INTERACCIONES ADICIONALES --- */
 
-// 1. Efecto Magnético en el Avatar
-// El avatar se inclina ligeramente hacia el mouse de forma independiente
-document.querySelectorAll('.profile-pic-container').forEach(avatar => {
-    avatar.addEventListener('mousemove', (e) => {
-        const rect = avatar.getBoundingClientRect();
-        const x = (e.clientX - rect.left - rect.width / 2) / 5;
-        const y = (e.clientY - rect.top - rect.height / 2) / 5;
-        avatar.style.transform = `translate(${x}px, ${y}px)`;
-    });
-    
-    avatar.addEventListener('mouseleave', () => {
-        avatar.style.transform = `translate(0px, 0px)`;
-        avatar.style.transition = "all 0.5s ease";
+// 1. Efecto Magnético en el Avatar (optimizado y respetando reduced-motion)
+document.addEventListener('DOMContentLoaded', () => {
+    const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) return;
+
+    const avatars = document.querySelectorAll('.profile-pic-container');
+    avatars.forEach(avatar => {
+        let last = null, ticking = false;
+        function apply() {
+            if (!last) { ticking = false; return; }
+            const e = last;
+            const rect = avatar.getBoundingClientRect();
+            const x = (e.clientX - rect.left - rect.width / 2) / 6; // más sutil
+            const y = (e.clientY - rect.top - rect.height / 2) / 6;
+            avatar.style.transform = `translate(${x}px, ${y}px)`;
+            ticking = false;
+        }
+
+        avatar.addEventListener('mousemove', (e) => {
+            last = e;
+            if (!ticking) { ticking = true; requestAnimationFrame(apply); }
+        }, { passive: true });
+
+        avatar.addEventListener('mouseleave', () => {
+            avatar.style.transition = 'transform 420ms cubic-bezier(0.2,0.9,0.2,1)';
+            avatar.style.transform = 'translate(0px, 0px)';
+            setTimeout(() => { avatar.style.transition = ''; }, 450);
+        });
     });
 });
 
@@ -542,3 +677,44 @@ document.querySelectorAll('.glass-pill').forEach(pill => {
 
 
 
+
+
+
+
+/**
+ * Crea una explosión de gotas de cristal líquido
+ */
+function splashParticles(x, y, color) {
+    const container = document.body;
+    const particleCount = 6; // Número de gotas
+
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'liquid-particle';
+        particle.style.backgroundColor = color;
+        
+        // Posición inicial
+        particle.style.left = x + 'px';
+        particle.style.top = y + 'px';
+
+        // Dirección aleatoria
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = 50 + Math.random() * 80;
+        const tx = Math.cos(angle) * velocity;
+        const ty = Math.sin(angle) * velocity;
+
+        container.appendChild(particle);
+
+        // Animación con física simple
+        const anim = particle.animate([
+            { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+            { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 }
+        ], {
+            duration: 600 + Math.random() * 400,
+            easing: 'cubic-bezier(0, .9, .57, 1)'
+        });
+
+        anim.onfinish = () => particle.remove();
+    }
+}
+ 

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "H7CoYPlOEoY=",
+  "dgSpecHash": "S4CfUtH2ttk=",
   "success": true,
-  "projectFilePath": "C:\\Users\\jmartinezg\\OneDrive - Comisión Nacional de Energía\\Escritorio\\Nueva carpeta\\Organigrama\\Organigrama.csproj",
+  "projectFilePath": "C:\\Users\\jmartinezg\\OneDrive - Comisión Nacional de Energía\\Escritorio\\Nueva carpeta\\Org\\Organigrama.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\jmartinezg\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\jmartinezg\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
