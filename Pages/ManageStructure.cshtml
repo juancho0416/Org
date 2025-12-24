@@ -1,72 +1,778 @@
 @page
 @model Organigrama.Pages.ManageStructureModel
 @{
-    ViewData["Title"] = "Editar Estructura del Organigrama";
-    Layout = "_Layout";
+    ViewData["Title"] = "Gestión de Estructura";
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/site.css" />
-}
+<!DOCTYPE html>
+<html lang="es">
 
-<a href="/Index" class="btn-regresar-custom">
-    <i class="fas fa-arrow-left"></i>Regresar a inicio</a>
-<div class="app-container">
-    <main>
-        <div class="org-container container py-4">
-            <header class="page-header mb-3">
-                <h1>Editar Estructura del Organigrama</h1>
-                <p class="lead-text">Agrega, elimina y reasigna jefes desde esta interfaz.</p>
-            </header>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        /* ============================================
+           VARIABLES Y CONFIGURACIÓN
+           ============================================ */
+        :root {
+            --color-primary: #5A67D8;
+            --color-primary-dark: #434190;
+            --color-secondary: #EEF0FA;
+            --color-success: #10b981;
+            --color-danger: #ef4444;
+            --color-warning: #f59e0b;
+            --color-text-dark: #1e293b;
+            --color-text-light: #64748b;
+            --color-border: #e2e8f0;
+            --color-background: #f8fafc;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+            --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
 
-            @if (TempData["Message"] != null)
-            {
-                <div class="alert alert-success">@TempData["Message"]</div>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--color-background);
+            color: var(--color-text-dark);
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           LAYOUT
+           ============================================ */
+        .manage-wrapper {
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .manage-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ============================================
+           HEADER
+           ============================================ */
+        .page-header {
+            margin-bottom: 30px;
+            animation: slideDown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @@keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
             }
 
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Agregar nuevo empleado</h5>
-                    <form method="post" asp-page-handler="Add" class="row g-2">
-                        <div class="col-md-3">
-                            <input asp-for="NewEmpleado.Nombre" class="form-control" placeholder="Nombre" />
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            border-radius: 16px;
+            background: white;
+            color: var(--color-primary);
+            text-decoration: none;
+            font-weight: 700;
+            border: 2px solid var(--color-border);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-base);
+            margin-bottom: 20px;
+        }
+
+        .btn-back:hover {
+            transform: translateX(-8px);
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .page-title {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 900;
+            color: var(--color-text-dark);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .title-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .page-subtitle {
+            color: var(--color-text-light);
+            font-size: 1.1rem;
+            margin-top: 8px;
+        }
+
+        /* ============================================
+           GRID LAYOUT
+           ============================================ */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 500px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        /* ============================================
+           CARD DE AGREGAR EMPLEADO
+           ============================================ */
+        .add-employee-card {
+            background: white;
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: var(--shadow-md);
+            border: 2px solid var(--color-border);
+            margin-bottom: 30px;
+            animation: slideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--color-secondary);
+            color: var(--color-primary);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--color-text-dark);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .form-grid-full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--color-text-dark);
+        }
+
+        .form-input,
+        .form-select {
+            padding: 12px 16px;
+            border: 2px solid var(--color-border);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: var(--color-background);
+            transition: var(--transition-base);
+            outline: none;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            border-color: var(--color-primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(90, 103, 216, 0.1);
+        }
+
+        .btn-submit {
+            padding: 14px 30px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: var(--transition-base);
+        }
+
+        .btn-submit:hover {
+            background: var(--color-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* ============================================
+           TABLA DE EMPLEADOS
+           ============================================ */
+        .employees-card {
+            background: white;
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: var(--shadow-md);
+            border: 2px solid var(--color-border);
+        }
+
+        .drop-zone {
+            border: 3px dashed var(--color-border);
+            padding: 25px;
+            border-radius: 16px;
+            text-align: center;
+            background: var(--color-background);
+            margin-bottom: 25px;
+            transition: var(--transition-base);
+        }
+
+        .drop-zone-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            color: var(--color-text-light);
+            font-weight: 600;
+        }
+
+        .drop-zone-icon {
+            font-size: 2rem;
+            opacity: 0.5;
+        }
+
+        .drop-zone.drag-over {
+            border-color: var(--color-primary);
+            background: var(--color-secondary);
+            transform: scale(1.02);
+        }
+
+        .drop-zone.drag-over .drop-zone-content {
+            color: var(--color-primary);
+        }
+
+        .employees-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+
+        .employees-table thead th {
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--color-text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .employees-table tbody tr {
+            background: var(--color-background);
+            border-radius: 12px;
+            transition: var(--transition-base);
+            cursor: grab;
+        }
+
+        .employees-table tbody tr:hover {
+            background: white;
+            transform: translateX(4px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .employees-table tbody tr.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .employees-table tbody tr.drag-over {
+            outline: 3px solid var(--color-primary);
+            outline-offset: 2px;
+            transform: scale(1.02);
+        }
+
+        .employees-table tbody td {
+            padding: 15px;
+            vertical-align: middle;
+        }
+
+        .employees-table tbody tr td:first-child {
+            border-radius: 12px 0 0 12px;
+        }
+
+        .employees-table tbody tr td:last-child {
+            border-radius: 0 12px 12px 0;
+        }
+
+        .employee-id {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: var(--color-secondary);
+            color: var(--color-primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+        }
+
+        .employee-name {
+            font-weight: 700;
+            color: var(--color-text-dark);
+        }
+
+        .employee-position {
+            font-size: 0.85rem;
+            color: var(--color-text-light);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: var(--color-success);
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .btn-delete {
+            padding: 8px 16px;
+            background: #fee2e2;
+            color: var(--color-danger);
+            border: 2px solid #fecaca;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+
+        .btn-delete:hover {
+            background: var(--color-danger);
+            color: white;
+            border-color: var(--color-danger);
+            transform: scale(1.05);
+        }
+
+        /* ============================================
+           VISTA PREVIA STICKY
+           ============================================ */
+        .preview-card {
+            position: sticky;
+            top: 20px;
+            background: white;
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 2px solid var(--color-border);
+            overflow: hidden;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .preview-header {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .preview-title {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-refresh {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-base);
+        }
+
+        .btn-refresh:hover {
+            background: white;
+            color: var(--color-primary);
+        }
+
+        .preview-body {
+            padding: 25px;
+            background: var(--color-background);
+            min-height: 500px;
+            max-height: 70vh;
+            overflow: auto;
+        }
+
+        #mermaid-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        /* ============================================
+           NOTIFICACIONES TOAST
+           ============================================ */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            padding: 20px 25px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 9999;
+            animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-left: 5px solid;
+            min-width: 300px;
+        }
+
+        .toast.success {
+            border-left-color: var(--color-success);
+        }
+
+        .toast.error {
+            border-left-color: var(--color-danger);
+        }
+
+        .toast.warning {
+            border-left-color: var(--color-warning);
+        }
+
+        .toast-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .toast.success .toast-icon {
+            background: #d1fae5;
+            color: var(--color-success);
+        }
+
+        .toast.error .toast-icon {
+            background: #fee2e2;
+            color: var(--color-danger);
+        }
+
+        .toast.warning .toast-icon {
+            background: #fef3c7;
+            color: var(--color-warning);
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 700;
+            color: var(--color-text-dark);
+            margin-bottom: 4px;
+        }
+
+        .toast-message {
+            font-size: 0.9rem;
+            color: var(--color-text-light);
+        }
+
+        @@keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @@keyframes slideOutRight {
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        /* ============================================
+           ANIMACIONES DE ACTUALIZACIÓN
+           ============================================ */
+        .row-updated {
+            animation: flashGreen 1.5s;
+        }
+
+        @@keyframes flashGreen {
+
+            0%,
+            100% {
+                background: var(--color-background);
+            }
+
+            50% {
+                background: #d1fae5;
+            }
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @@media (max-width: 1200px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-card {
+                position: relative;
+                top: 0;
+            }
+        }
+
+        @@font -palette-values@media (max-width: 768px) {
+            .manage-wrapper {
+                padding: 20px 10px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .add-employee-card,
+            .employees-card {
+                padding: 20px;
+            }
+
+            .employees-table {
+                font-size: 0.85rem;
+            }
+
+            .employees-table thead {
+                display: none;
+            }
+
+            .employees-table tbody tr {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .employees-table tbody td {
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="manage-wrapper">
+        <div class="manage-container">
+            <!-- Header -->
+            <div class="page-header">
+                <a href="/Index" class="btn-back">
+                    <i class="fas fa-arrow-left"></i>
+                    Volver al Organigrama
+                </a>
+                <div class="header-content">
+                    <div>
+                        <div class="page-title">
+                            <div class="title-icon">
+                                <i class="fas fa-network-wired"></i>
+                            </div>
+                            <span>Gestión de Estructura</span>
                         </div>
-                        <div class="col-md-3">
-                            <input asp-for="NewEmpleado.Puesto" class="form-control" placeholder="Puesto" />
-                        </div>
-                        <div class="col-md-2">
-                            <input asp-for="NewEmpleado.Area" class="form-control" placeholder="Area" />
-                        </div>
-                        <div class="col-md-2">
-                            <input asp-for="NewEmpleado.Email" class="form-control" placeholder="Email" />
-                        </div>
-                        <div class="col-md-2">
-                            <select asp-for="NewEmpleado.JefeId" class="form-select">
-                                <option value="">(Sin Jefe)</option>
-                                @foreach (var m in Model.Empleados)
-                                {
-                                    <option value="@m.Id">(@m.Id) @m.Nombre</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="col-12 mt-2">
-                            <button type="submit" class="btn btn-success">Agregar empleado</button>
-                        </div>
-                    </form>
+                        <p class="page-subtitle">Administra la jerarquía organizacional completa</p>
+                    </div>
                 </div>
             </div>
 
-            <form method="post">
-                <div class="card">
-                    <div class="card-body">
-                        <div id="drop-root" class="drop-root mb-3">Arrastra aquí para dejar sin jefe (Soltar para quitar
-                            jefe)</div>
-                        <table class="table table-striped">
+            <!-- Formulario de Agregar Empleado -->
+            <div class="add-employee-card">
+                <div class="card-header-section">
+                    <div class="card-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h2 class="card-title">Agregar Nuevo Empleado</h2>
+                </div>
+
+                <form method="post" asp-page-handler="Add">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Nombre Completo *</label>
+                            <input asp-for="NewEmpleado.Nombre" class="form-input" placeholder="Ej: Juan Pérez"
+                                required />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Puesto *</label>
+                            <input asp-for="NewEmpleado.Puesto" class="form-input" placeholder="Ej: Gerente de Ventas"
+                                required />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Área</label>
+                            <input asp-for="NewEmpleado.Area" class="form-input" placeholder="Ej: Comercial" />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input asp-for="NewEmpleado.Email" type="email" class="form-input"
+                                placeholder="ejemplo@empresa.com" />
+                        </div>
+
+                        <div class="form-group form-grid-full">
+                            <label class="form-label">Reporta a</label>
+                            <select asp-for="NewEmpleado.JefeId" class="form-select">
+                                <option value="">Sin jefe directo (nivel superior)</option>
+                                @foreach (var emp in Model.Empleados)
+                                {
+                                    <option value="@emp.Id">@emp.Nombre - @emp.Puesto</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group form-grid-full">
+                            <button type="submit" class="btn-submit">
+                                <i class="fas fa-plus-circle"></i>
+                                Agregar Empleado
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Grid de contenido -->
+            <div class="content-grid">
+                <!-- Tabla de empleados -->
+                <div class="employees-card">
+                    <div class="card-header-section">
+                        <div class="card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <h2 class="card-title">Empleados Registrados</h2>
+                            <p style="color: var(--color-text-light); margin-top: 5px;">
+                                Total: @Model.Empleados.Count empleados
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Zona de drop para quitar jefe -->
+                    <div id="drop-root" class="drop-zone">
+                        <div class="drop-zone-content">
+                            <div class="drop-zone-icon">
+                                <i class="fas fa-hand-paper"></i>
+                            </div>
+                            <span>Arrastra aquí para quitar jefe</span>
+                        </div>
+                    </div>
+
+                    <!-- Tabla -->
+                    <div style="overflow-x: auto;">
+                        <table class="employees-table">
                             <thead>
                                 <tr>
-                                    <th>Id</th>
-                                    <th>Nombre</th>
-                                    <th>Puesto</th>
+                                    <th>ID</th>
+                                    <th>Empleado</th>
                                     <th>Jefe Actual</th>
                                     <th>Asignar Jefe</th>
                                     <th>Acciones</th>
@@ -75,26 +781,45 @@
                             <tbody>
                                 @foreach (var emp in Model.Empleados)
                                 {
-                                    <tr class="draggable-row" draggable="true" data-emp-id="@emp.Id" aria-grabbed="false">
-                                        <td>@emp.Id</td>
-                                        <td>@emp.Nombre</td>
-                                        <td>@emp.Puesto</td>
-                                        <td>@(emp.JefeId.HasValue? emp.JefeId.ToString() : "(Sin Jefe)")</td>
+                                    <tr class="draggable-row" draggable="true" data-emp-id="@emp.Id">
+                                        <td>
+                                            <div class="employee-id">@emp.Id</div>
+                                        </td>
+                                        <td>
+                                            <div class="employee-name">@emp.Nombre</div>
+                                            <div class="employee-position">@emp.Puesto</div>
+                                        </td>
+                                        <td>
+                                            @if (emp.JefeId.HasValue)
+                                            {
+                                                var jefe = Model.Empleados.FirstOrDefault(e => e.Id == emp.JefeId);
+                                                <span class="badge badge-success">
+                                                    @(jefe?.Nombre ?? $"ID: {emp.JefeId}")
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-warning">Sin jefe</span>
+                                            }
+                                        </td>
                                         <td>
                                             <select name="manager_@emp.Id" class="form-select">
-                                                <option value="">(Sin Jefe)</option>
+                                                <option value="">Sin jefe directo</option>
                                                 @foreach (var m in Model.Empleados)
                                                 {
-                                                    if (m.Id == emp.Id) { continue; }
-                                                    <option value="@m.Id" selected="@(m.Id == emp.JefeId ? "selected" : null)">
-                                                        (@m.Id) @m.Nombre - @m.Puesto</option>
+                                                    if (m.Id == emp.Id) continue;
+                                                    <option value="@m.Id" selected="@(m.Id == emp.JefeId)">
+                                                        @m.Nombre - @m.Puesto
+                                                    </option>
                                                 }
                                             </select>
                                         </td>
                                         <td>
                                             <form method="post" asp-page-handler="Delete" asp-route-id="@emp.Id"
-                                                onsubmit="return confirm('¿Borrar empleado y dejar subordinados sin jefe?')">
-                                                <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                                                style="display: inline;">
+                                                <button type="submit" class="btn-delete">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
                                             </form>
                                         </td>
                                     </tr>
@@ -103,195 +828,359 @@
                         </table>
                     </div>
                 </div>
-            </form>
 
-            <p class="text-muted small mt-3">Nota: la página previene asignaciones que creen ciclos (no puedes asignarte
-                como jefe a un subordinado).</p>
+                <!-- Vista previa -->
+                <div class="preview-card">
+                    <div class="preview-header">
+                        <div class="preview-title">
+                            <i class="fas fa-eye"></i>
+                            Vista Previa en Tiempo Real
+                        </div>
+                        <button class="btn-refresh" onclick="updateLiveChart()">
+                            <i class="fas fa-sync-alt"></i>
+                            Actualizar
+                        </button>
+                    </div>
+                    <div class="preview-body">
+                        <div id="mermaid-container" class="mermaid">
+                            graph TD
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </main>
-</div>
-<style>
-    :root {
-        --area-primary: #5A67D8;
-        --area-secondary: #EEF0FA;
+    </div>
+</body>
+<script>
+    // ============================================
+    // SISTEMA DE NOTIFICACIONES
+    // ============================================
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+
+        const icons = {
+            success: 'fa-check-circle',
+            error: 'fa-exclamation-circle',
+            warning: 'fa-exclamation-triangle'
+        };
+
+        const titles = {
+            success: '¡Éxito!',
+            error: 'Error',
+            warning: 'Advertencia'
+        };
+
+        toast.innerHTML = `
+                <div class="toast-icon">
+                    <i class="fas ${icons[type]}"></i>
+                </div>
+                <div class="toast-content">
+                    <div class="toast-title">${titles[type]}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+            `;
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.animation = 'slideOutRight 0.3s ease forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
     }
 
-    .btn-regresar-custom {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        background: white;
-        color: var(--area-primary);
-        padding: 10px 22px;
-        border-radius: 12px;
-        font-weight: 700px;
-        text-decoration: none !important;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        border: 1px solid #e2e8f0;
-        margin-bottom: 25px;
-        transition: all 0.3s ease;
-    }
+    // ============================================
+    // CAMBIO DE JEFE CON SELECT
+    // ============================================
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('select[name^="manager_"]').forEach(select => {
+            select.setAttribute('data-prev', select.value || '');
 
-    .btn-regresar-custom:hover {
-        transform: translateX(-5px);
-        background: var(--area-primary);
-        color: white;
-        box-shadow: 0 6px 15px rgba(90, 103, 216, 0.3);
-    }
-</style>
-@section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('select[name^="manager_"]').forEach(function (sel) {
-                sel.setAttribute('data-prev', sel.value || '');
-                sel.addEventListener('change', async function () {
-                    const name = this.name;
-                    const empId = parseInt(name.replace('manager_', ''));
-                    const val = this.value;
-                    const mgrId = val ? parseInt(val) : null;
-                    this.disabled = true;
-                    try {
-                        const res = await fetch('/api/manage/update-manager', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ employeeId: empId, managerId: mgrId })
-                        });
-                        const data = await res.json();
-                        if (res.ok && data && data.success) {
-                            showToast(data.message || 'Guardado');
-                            this.setAttribute('data-prev', this.value || '');
+            select.addEventListener('change', async function () {
+                const empId = parseInt(this.name.replace('manager_', ''));
+                const newManagerId = this.value ? parseInt(this.value) : null;
+
+                this.disabled = true;
+
+                try {
+                    const response = await fetch('/api/manage/update-manager', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            employeeId: empId,
+                            managerId: newManagerId
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.success) {
+                        showToast(data.message || 'Asignación actualizada', 'success');
+                        this.setAttribute('data-prev', this.value || '');
+
+                        // Actualizar badge
+                        const row = this.closest('tr');
+                        const badgeCell = row.querySelector('td:nth-child(3)');
+                        if (newManagerId) {
+                            const jefeOption = this.querySelector(`option[value="${newManagerId}"]`);
+                            const jefeNombre = jefeOption ? jefeOption.textContent.split(' - ')[0] : `ID: ${newManagerId}`;
+                            badgeCell.innerHTML = `<span class="badge badge-success">${jefeNombre}</span>`;
                         } else {
-                            alert(data?.message || 'Error al actualizar');
-                            this.value = this.getAttribute('data-prev') || '';
+                            badgeCell.innerHTML = '<span class="badge badge-warning">Sin jefe</span>';
                         }
-                    } catch (err) {
-                        alert('Error de red');
+
+                        // Animar fila
+                        row.classList.add('row-updated');
+                        setTimeout(() => row.classList.remove('row-updated'), 1500);
+
+                        // Actualizar diagrama
+                        updateLiveChart();
+                    } else {
+                        showToast(data.message || 'Error al actualizar', 'error');
                         this.value = this.getAttribute('data-prev') || '';
                     }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showToast('Error de conexión', 'error');
+                    this.value = this.getAttribute('data-prev') || '';
+                } finally {
                     this.disabled = false;
-                });
+                }
+            });
+        });
+    });
+
+    // DRAG & DROP
+    // ============================================
+    document.addEventListener('DOMContentLoaded', () => {
+        const rows = document.querySelectorAll('tr.draggable-row');
+        const dropRoot = document.getElementById('drop-root');
+        rows.forEach(row => {
+            // Drag start
+            row.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', row.dataset.empId);
+                row.classList.add('dragging');
             });
 
-            function showToast(msg) {
-                const el = document.createElement('div');
-                el.className = 'toast-msg';
-                el.innerText = msg;
-                Object.assign(el.style, { position: 'fixed', right: '20px', bottom: '20px', padding: '10px 14px', background: '#222', color: '#fff', borderRadius: '8px', zIndex: 99999 });
-                document.body.appendChild(el);
-                setTimeout(() => el.remove(), 2200);
-            }
-        });
-    </script>
-    <style>
-        .draggable-row.dragging {
-            opacity: 0.5;
-        }
-
-        .draggable-row.drag-over {
-            outline: 3px dashed rgba(90, 103, 216, 0.6);
-        }
-
-        .drop-root {
-            border: 2px dashed #d1d5db;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-            color: #374151;
-            background: #fafafa;
-        }
-
-        .drop-root.drag-over {
-            border-color: #5A67D8;
-            background: #f1f5ff;
-            color: #1e293b;
-        }
-    </style>
-    <script>
-        // Drag & Drop para reasignar jefes arrastrando filas
-        document.addEventListener('DOMContentLoaded', function () {
-            function _toast(msg) {
-                if (typeof showToast === 'function') { showToast(msg); return; }
-                const el = document.createElement('div');
-                el.className = 'toast-msg';
-                el.innerText = msg;
-                Object.assign(el.style, { position: 'fixed', right: '20px', bottom: '20px', padding: '10px 14px', background: '#222', color: '#fff', borderRadius: '8px', zIndex: 99999 });
-                document.body.appendChild(el);
-                setTimeout(() => el.remove(), 2200);
-            }
-
-            const rows = document.querySelectorAll('tr.draggable-row');
-            rows.forEach(row => {
-                row.addEventListener('dragstart', (e) => {
-                    e.dataTransfer.setData('text/plain', row.dataset.empId);
-                    row.classList.add('dragging');
-                    row.setAttribute('aria-grabbed', 'true');
-                });
-                row.addEventListener('dragend', () => { row.classList.remove('dragging'); row.setAttribute('aria-grabbed', 'false'); });
-
-                row.addEventListener('dragover', (e) => { e.preventDefault(); row.classList.add('drag-over'); });
-                row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
-
-                row.addEventListener('drop', async (e) => {
-                    e.preventDefault(); row.classList.remove('drag-over');
-                    const draggedId = parseInt(e.dataTransfer.getData('text/plain'));
-                    const targetId = parseInt(row.dataset.empId);
-                    if (!draggedId || !targetId || draggedId === targetId) return;
-                    if (!confirm(`¿Asignar empleado ${draggedId} bajo el jefe ${targetId}?`)) return;
-                    try {
-                        const res = await fetch('/api/manage/update-manager', {
-                            method: 'POST', headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ employeeId: draggedId, managerId: targetId })
-                        });
-                        const data = await res.json();
-                        if (res.ok && data && data.success) {
-                            _toast(data.message || 'Asignación guardada');
-                            const sel = document.querySelector(`select[name="manager_${draggedId}"]`);
-                            if (sel) { sel.value = targetId; sel.setAttribute('data-prev', sel.value || ''); }
-                            // actualizar columna "Jefe Actual"
-                            const draggedRow = document.querySelector(`tr[data-emp-id="${draggedId}"]`);
-                            if (draggedRow) {
-                                const jefeCell = draggedRow.children[3];
-                                if (jefeCell) jefeCell.textContent = targetId.toString();
-                                draggedRow.setAttribute('aria-grabbed', 'false');
-                            }
-                        } else {
-                            alert(data?.message || 'Error al actualizar');
-                        }
-                    } catch (err) { alert('Error de red'); }
-                });
+            // Drag end
+            row.addEventListener('dragend', () => {
+                row.classList.remove('dragging');
             });
 
-            const dropRoot = document.getElementById('drop-root');
-            if (dropRoot) {
-                dropRoot.addEventListener('dragover', (e) => { e.preventDefault(); dropRoot.classList.add('drag-over'); });
-                dropRoot.addEventListener('dragleave', () => dropRoot.classList.remove('drag-over'));
-                dropRoot.addEventListener('drop', async (e) => {
-                    e.preventDefault(); dropRoot.classList.remove('drag-over');
-                    const draggedId = parseInt(e.dataTransfer.getData('text/plain'));
-                    if (!draggedId) return;
-                    if (!confirm(`¿Quitar jefe del empleado ${draggedId} (dejar sin jefe)?`)) return;
-                    try {
-                        const res = await fetch('/api/manage/update-manager', {
-                            method: 'POST', headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ employeeId: draggedId, managerId: null })
-                        });
-                        const data = await res.json();
-                        if (res.ok && data && data.success) {
-                            _toast(data.message || 'Empleado sin jefe');
-                            const sel = document.querySelector(`select[name="manager_${draggedId}"]`);
-                            if (sel) { sel.value = ''; sel.setAttribute('data-prev', ''); }
-                            const draggedRow = document.querySelector(`tr[data-emp-id="${draggedId}"]`);
-                            if (draggedRow) {
-                                const jefeCell = draggedRow.children[3];
-                                if (jefeCell) jefeCell.textContent = '(Sin Jefe)';
-                                draggedRow.setAttribute('aria-grabbed', 'false');
-                            }
-                        } else {
-                            alert(data?.message || 'Error al actualizar');
-                        }
-                    } catch (err) { alert('Error de red'); }
-                });
+            // Drag over (permitir drop)
+            row.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                row.classList.add('drag-over');
+            });
+
+            // Drag leave
+            row.addEventListener('dragleave', () => {
+                row.classList.remove('drag-over');
+            });
+
+            // Drop en otra fila
+            row.addEventListener('drop', async (e) => {
+                e.preventDefault();
+                row.classList.remove('drag-over');
+
+                const draggedId = parseInt(e.dataTransfer.getData('text/plain'));
+                const targetId = parseInt(row.dataset.empId);
+
+                if (!draggedId || !targetId || draggedId === targetId) return;
+
+                const targetName = row.querySelector('.employee-name').textContent;
+                if (!confirm(`¿Asignar empleado como subordinado de ${targetName}?`)) return;
+
+                await updateManager(draggedId, targetId);
+            });
+        });
+
+        // Drop zone para quitar jefe
+        if (dropRoot) {
+            dropRoot.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropRoot.classList.add('drag-over');
+            });
+
+            dropRoot.addEventListener('dragleave', () => {
+                dropRoot.classList.remove('drag-over');
+            });
+
+            dropRoot.addEventListener('drop', async (e) => {
+                e.preventDefault();
+                dropRoot.classList.remove('drag-over');
+
+                const draggedId = parseInt(e.dataTransfer.getData('text/plain'));
+                if (!draggedId) return;
+
+                if (!confirm('¿Quitar jefe de este empleado?')) return;
+
+                await updateManager(draggedId, null);
+            });
+        }
+    });
+
+    // ============================================
+    // FUNCIÓN DE ACTUALIZACIÓN DE JEFE
+    // ============================================
+    async function updateManager(employeeId, managerId) {
+        try {
+            const response = await fetch('/api/manage/update-manager', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ employeeId, managerId })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                showToast(data.message || 'Asignación actualizada', 'success');
+
+                // Actualizar select
+                const select = document.querySelector(`select[name="manager_${employeeId}"]`);
+                if (select) {
+                    select.value = managerId || '';
+                    select.setAttribute('data-prev', select.value);
+                }
+
+                // Actualizar badge
+                const row = document.querySelector(`tr[data-emp-id="${employeeId}"]`);
+                if (row) {
+                    const badgeCell = row.querySelector('td:nth-child(3)');
+                    if (managerId) {
+                        const jefeRow = document.querySelector(`tr[data-emp-id="${managerId}"]`);
+                        const jefeNombre = jefeRow ? jefeRow.querySelector('.employee-name').textContent : `ID: ${managerId}`;
+                        badgeCell.innerHTML = `<span class="badge badge-success">${jefeNombre}</span>`;
+                    } else {
+                        badgeCell.innerHTML = '<span class="badge badge-warning">Sin jefe</span>';
+                    }
+
+                    // Animar
+                    row.classList.add('row-updated');
+                    setTimeout(() => row.classList.remove('row-updated'), 1500);
+                }
+
+                // Actualizar diagrama
+                updateLiveChart();
+            } else {
+                showToast(data.message || 'Error al actualizar', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('Error de conexión', 'error');
+        }
+    }
+
+    // ============================================
+    // ACTUALIZACIÓN DE DIAGRAMA MERMAID
+    // ============================================
+    function updateLiveChart() {
+        const container = document.getElementById('mermaid-container');
+        let chartDefinition = "graph TD\n";
+
+        const rows = document.querySelectorAll('tr.draggable-row');
+        const nodes = new Map();
+
+        // Recopilar todos los nodos
+        rows.forEach(row => {
+            const id = row.dataset.empId;
+            const nombre = row.querySelector('.employee-name').textContent;
+            const puesto = row.querySelector('.employee-position').textContent;
+            const select = row.querySelector('select[name^="manager_"]');
+            const jefeId = select.value;
+
+            nodes.set(id, { nombre, puesto, jefeId });
+        });
+
+        // Crear definición de nodos con estilo
+        nodes.forEach((data, id) => {
+            const label = `${data.nombre}<br /><small>${data.puesto}</small>`;
+            chartDefinition += `  ${id}["${label}"]\n`;
+
+            // Estilo basado en si tiene subordinados
+            const hasSubordinates = Array.from(nodes.values()).some(n => n.jefeId === id);
+            if (hasSubordinates) {
+                chartDefinition += `  style ${id} fill:#EEF0FA,stroke:#5A67D8,stroke-width:3px\n`;
             }
         });
-    </script>
-}
+
+        // Crear conexiones
+        nodes.forEach((data, id) => {
+            if (data.jefeId) {
+                chartDefinition += `  ${data.jefeId} --> ${id}\n`;
+            }
+        });
+
+        // Renderizar
+        container.removeAttribute('data-processed');
+        container.innerHTML = chartDefinition;
+
+        try {
+            mermaid.run({ nodes: [container] });
+        } catch (error) {
+            console.error('Error renderizando diagrama:', error);
+            container.innerHTML = '<p style="color: #ef4444; text-align: center; padding: 20px;">Error al generar diagrama. Verifique la jerarquía.</p>';
+        }
+    }
+
+    // ============================================
+    // INICIALIZACIÓN
+    // ============================================
+    document.addEventListener('DOMContentLoaded', () => {
+        // Configurar Mermaid
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'neutral',
+            themeVariables: {
+                primaryColor: '#EEF0FA',
+                primaryTextColor: '#1e293b',
+                primaryBorderColor: '#5A67D8',
+                lineColor: '#5A67D8',
+                secondaryColor: '#f8fafc',
+                tertiaryColor: '#fff'
+            },
+            flowchart: {
+                curve: 'basis',
+                padding: 20
+            }
+        });
+
+        // Renderizar diagrama inicial
+        updateLiveChart();
+
+        // Confirmación mejorada para delete
+        document.querySelectorAll('form[asp-page-handler="Delete"]').forEach(form => {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const row = form.closest('tr');
+                const empName = row.querySelector('.employee-name').textContent;
+
+                if (confirm(`¿Estás seguro de eliminar a ${empName}?\n\nLos subordinados quedarán sin jefe.`)) {
+                    form.submit();
+                }
+            });
+        });
+    });
+
+    // ============================================
+    // MENSAJES DE TEMPDATA
+    // ============================================
+    @if (TempData["Message"] != null)
+        {
+            <text>
+                                                    window.addEventListener('DOMContentLoaded', () => {
+                    showToast('@TempData["Message"]', 'success');
+                                                    });
+            </text>
+    }
+
+        @if (TempData["Error"] != null)
+        {
+            <text>
+                                                    window.addEventListener('DOMContentLoaded', () => {
+                    showToast('@TempData["Error"]', 'error');
+                                                    });
+            </text>
+    }
+</script>
