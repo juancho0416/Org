@@ -14,7 +14,17 @@ namespace Organigrama.Pages
         {
             _db = db;
         }
-
+        private bool CreatesCycle(int employeeId, int newManagerId, List<Empleado> allEmployees)
+        {
+            var current = allEmployees.FirstOrDefault(e => e.Id == newManagerId);
+            while (current != null)
+            {
+                if (current.Id == employeeId) return true;
+                if (!current.JefeId.HasValue) break;
+                current = allEmployees.FirstOrDefault(e => e.Id == current.JefeId);
+            }
+            return false;
+        }
         public List<Empleado> Empleados { get; set; } = new();
         [BindProperty]
         public Empleado NewEmpleado { get; set; } = new();
@@ -140,3 +150,4 @@ namespace Organigrama.Pages
         }
     }
 }
+
